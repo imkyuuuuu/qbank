@@ -1,521 +1,621 @@
+// /banks/bank-cl-2025.js
 window.QUIZ_BANKS = window.QUIZ_BANKS || {};
 
-window.QUIZ_BANKS["CL"] = {
-  "label": "Consultation-liaison (2021–2025)",
-  "questions": [
+window.QUIZ_BANKS["CL 2025"] = {
+  label: "CL 2025",
+  questions: [
+
     {
-      "id": "CL-001",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "(Repeat) Jeune femme de 32 ans a eu sx pseudo-grippaux, ensuite sx psychotiques, mouvements anormaux, perte de mémoire, utilise des mots sans lien avec la question. Traitée avec risperdal 1 mg, amélioration et libérée de l'hôpital. Ses amis la ramènent à l’urgence un mois plus tard car récidive psychotique, agitée, désorganisée. Quelle investigation confirmera le diagnostic?",
-      "options": [
-        "PL",
-        "IRM",
-        "EEG",
-        "Consultation en neuropsychologie"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-029",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Jeune femme de 32 ans a eu des symptômes pseudo-grippaux, ensuite des symptômes psychotiques, mouvements anormaux, perte de mémoire, utilise des mots sans lien avec la question. Traitée avec rispéridone 1 mg, amélioration et libérée. Revient un mois plus tard avec récidive psychotique, agitation et désorganisation. Quelle investigation confirmera le diagnostic?",
+      choices: ["PL", "IRM", "EEG", "Consultation en neuropsychologie"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-002",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Patiente âgée MAB sous lamotrigine de longue date. Stevens-Johnson. Son médecin de famille a ajouté quel Rx récemment pour sa dépression?",
-      "options": [
-        "Carbamazépine",
-        "Epival",
-        ""
-      ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": true
+      id: "CL2025-030",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Patiente âgée MAB sous lamotrigine de longue date. Stevens-Johnson. Son médecin de famille a ajouté quel Rx récemment pour sa dépression?",
+      choices: ["Carbamazépine", "Epival"],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-003",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Qqn a l’air d’avoir un syndrome d’apnée-hypopnée du sommeil (fatigue, se réveille la nuit, céphalée, diff concentration, sommeil non réparateur), humeur est correcte. Quelle échelle vous permettrait de mieux dépister ce qui se passe?",
-      "options": [
-        "HAM-D",
-        "STOP-BANG",
-        "Short Form 36",
-        "Insomnia severity index"
-      ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-031",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Patient avec fatigue, réveils nocturnes, céphalées, difficultés de concentration, sommeil non réparateur, humeur correcte. Quelle échelle permettrait de mieux dépister la problématique?",
+      choices: ["HAM-D", "STOP-BANG", "Short Form 36", "Insomnia Severity Index"],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-004",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Patiente, femme, ménopause. A fait plusieurs fausses couches, a pris COC pendant 10 ans avant d'avoir son enfant à 39 ans. Ce qui la met le plus à risque de syndrome d’apnée du sommeil?",
-      "options": [
-        "Plusieurs fausses couches",
-        "COC pendant 10 ans",
-        "Avoir eu une grossesse à terme",
-        "Ménopause"
-      ],
-      "answerIndex": 3,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-032",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Patiente ménopausée, antécédents de plusieurs fausses couches, prise de COC pendant 10 ans avant grossesse à 39 ans. Quel facteur la met le plus à risque de syndrome d’apnée du sommeil?",
+      choices: ["Plusieurs fausses couches", "COC pendant 10 ans", "Avoir eu une grossesse à terme", "Ménopause"],
+      answerIndex: 3,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-005",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Pte qui avait une convulsion fébrile en jeune âge. Prend antipsychotique (indication bonne, mais on ne souvient pas laquelle). Admise en neurologie pour des tremblements des deux bras et un des symptômes moteurs du membre droit (rigidité?). La neurologue soutient le membre droit et demande avec la main gauche de faire des mouvements rythmiques. Quel élément serait le plus en faveur d’un tremblement fonctionnel?",
-      "options": [
-        "Quand on immobilise le membre atteint, pas de tremblement aux autres membres",
+      id: "CL2025-033",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Patiente avec antécédent de convulsion fébrile, sous antipsychotique, présente tremblements bilatéraux. Lorsqu’on demande des mouvements rythmiques controlatéraux, le tremblement du membre atteint devient entraînable. Quel élément favorise un tremblement fonctionnel?",
+      choices: [
+        "Immobilisation du membre atteint élimine le tremblement ailleurs",
         "Tremblement augmente quand le patient est distrait",
         "Tremblement augmente au repos",
-        "Quand on fait faire mouvement de tapotement au membre controlatéral, le tremblement du membre atteint est entrainable (ça ne disait pas est “entrainable” en français, 100% sûre que ça disait verbatim que le tremblement “augmente au membre atteint”… ce qui serait l’opposé et change tout! 😯)"
+        "Tremblement entraînable par mouvements controlatéraux"
       ],
-      "answerIndex": 3,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      answerIndex: 3,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-006",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Madame avocate, arrêt travail prolongé depuis 3 ans. Symptômes de fatigue chronique. Sx dépressifs, mais sans EDC franc et n’a pas répondu aux essais d’AD. Quand elle fait de l’exercice, ++ fatiguée après. Aime tricoter, voudrait reprendre la danse. Que proposer?",
-      "options": [
-        "Test neuropsy pour voir si sx cognitifs sont factices/simulés",
-        "Entraînement pacing post-exercice (en anglais, post-exercice pacing )",
-        "Antipsychotiques pour mieux traiter l’encéphalomyélite myalgique",
-        "Esketamine pour traiter sa dépression réfractaire"
+      id: "CL2025-034",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Avocate en arrêt de travail prolongé, fatigue chronique, symptômes dépressifs sans EDC franc, non réponse aux AD, fatigue post-exercice importante. Que proposer?",
+      choices: [
+        "Test neuropsychologique",
+        "Entraînement pacing post-exercice",
+        "Antipsychotiques",
+        "Eskétamine"
       ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-007",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Garçon de 17 ans qui saute d’un balcon. Atteinte lobe préfrontal dorsolatéral G. atteinte plus probable?/ Un jeune homme de 17 ans était bon à l’école, a eu un accident d’auto, et le CT montre un saignement au niveau dorsolatéral. Quels symptômes devrait-on s’attendre à retrouver chez lui?",
-      "options": [
-        "Tb fonctions exécutives",
-        "Apathie-aboulie",
-        "Désinhibition sociale",
-        "impulsivité"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-035",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Garçon de 17 ans avec atteinte du lobe préfrontal dorsolatéral gauche. Quel déficit est le plus probable?",
+      choices: ["Troubles des fonctions exécutives", "Apathie-aboulie", "Désinhibition sociale", "Impulsivité"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-008",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Délirium chez un patient. Selon l’échelle CAM quel est l’élément essentiel à faire ressortir à l’évaluation?",
-      "options": [
-        "Inattention",
-        "Désorientation",
-        "Hallucinations"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-036",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Délirium : selon l’échelle CAM, quel est l’élément essentiel?",
+      choices: ["Inattention", "Désorientation", "Hallucinations"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-009",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Délirium chez patient âgé, fluctuation de l’attention, s’endort durant votre entrevue, voit ses animaux de compagnies dans sa chambre. Pas agressif. En plus de traiter la cause sous-jacente, qu’est-ce que vous recommandez à l’équipe de médecine interne?",
-      "options": [
-        "mesures non pharmaco",
-        "antipsychotique",
-        "Benzo"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-037",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Délirium chez patient âgé, hallucinations visuelles non agressif. En plus de traiter la cause, que recommander?",
+      choices: ["Mesures non pharmacologiques", "Antipsychotique", "Benzodiazépine"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-010",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Femme d’environ 60 ans (plus jeune, elle avait 56 ans) avec du lithium et du gabapentin, doses stables depuis des années, lithémie à 0.8. Elle a une voix douce, développe des symptômes de raideur sur quelques mois, difficulté à se relever de sa chaise, tremblement de repos bilatéral symétrique, hypomimie faciale/diminution expression faciale, démarche lente. Quelle est la meilleure prochaine étape?",
-      "options": [
-        "Cogentin",
-        "Levodopa",
-        "Diminution du lithium",
-        "Diminution gabapentin"
-      ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-038",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Patiente sous lithium et gabapentin stables, développe rigidité, tremblement de repos, hypomimie, démarche lente. Prochaine étape?",
+      choices: ["Cogentin", "Levodopa", "Diminution du lithium", "Diminution gabapentin"],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-011",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "(Repeat) Femme sous antipsychotique avec mouvements rapides rythmés de la mâchoire sur un axe vertical. Pas de mouvements anormaux de la langue. Comment traiter ?",
-      "options": [
-        "Cogentin/Benztropine",
-        "Diminuer la dose",
-        "Tétrabénazine",
-        "Propranolol"
-      ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      id: "CL2025-039",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Femme sous antipsychotique avec mouvements rapides verticaux de la mâchoire, sans atteinte linguale. Traitement?",
+      choices: ["Benztropine", "Diminuer la dose", "Tétrabénazine", "Propranolol"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+
     {
-      "id": "CL-012",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2025,
-      "category": "CL",
-      "stem": "Guidelines récents indiquent qu’il n’est pas recommandé de traiter le trouble d’usage ROH concomitant avec une dépression avec des ISRS. Qu’est-ce qui est le plus susceptible de survenir comme effet indésirable selon l’étude si on combine ISRS/EDC/Trouble d’usage?",
-      "options": [
-        "Augmentation des complications GI",
-        "Augmentation des idées suicidaires",
-        "Augmentation de la consommation de ROH"
+      id: "CL2025-040",
+      source: "CL 2025",
+      year: 2025,
+      stem: "Selon les guidelines récents, combiner ISRS et trouble d’usage d’alcool avec dépression augmente surtout quel risque?",
+      choices: [
+        "Complications GI",
+        "Idées suicidaires",
+        "Augmentation de la consommation d’alcool"
       ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2025"
-      ],
-      "needsReview": false
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2025"]
     },
+    
     {
-      "id": "CL-013",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "2. Repeat : Lequel est un syndrome génétique lié à l’X récessif?",
-      "options": [
+      id: "CL2024-074",
+      source: "CL 2024",
+      year: 2024,
+      stem: "Homme de 55 ans avec délire grandiose d’apparition récente, déclin cognitif progressif (atteinte exécutive + deux autres domaines). Long historique de relations sexuelles non protégées avec partenaires multiples. Bilan métabolique et FSC normaux. VIH négatif. Refuse l’imagerie. Quel test est le plus susceptible d’identifier la cause?",
+      choices: [
+        "Anticorps anti-NMDA",
+        "Sérologies herpès simplex B",
+        "VDRL",
+        "Céruloplasmine"
+      ],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2024"]
+    },
+
+    {
+      id: "CL2024-075",
+      source: "CL 2024",
+      year: 2024,
+      stem: "Parmi les éléments suivants, lequel est un signe d’encéphalite?",
+      choices: [
+        "Anomalie T2 FLAIR à l’IRM",
+        "Spikes 20–30 Hz à l’EEG"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2024"]
+    },
+
+    {
+      id: "CL2024-076",
+      source: "CL 2024",
+      year: 2024,
+      stem: "Patient de 40 ans avec IRC terminale sous dialyse trois fois par semaine (glomérulonéphrite). MAB type I, n’a répondu qu’au lithium. Quelle est la meilleure conduite?",
+      choices: [
+        "Ne pas donner de lithium",
+        "Lithium faible dose BID",
+        "Administrer le lithium uniquement immédiatement après chaque séance de dialyse"
+      ],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2024"]
+    },
+
+    {
+      id: "CL2024-077",
+      source: "CL 2024",
+      year: 2024,
+      stem: "Patiente avec tableau de démence et anomalies des petits vaisseaux à la TDM. Quelle modalité d’imagerie est la meilleure pour suivre la progression?",
+      choices: [
+        "IRM",
+        "TDM",
+        "TEP"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2024"]
+    },
+
+    {
+      id: "CL2024-078",
+      source: "CL 2024",
+      year: 2024,
+      stem: "Adolescente présentant un trouble de conversion / pseudoconvulsions. Quel traitement possède les meilleures données probantes?",
+      choices: [
+        "Psychoéducation",
+        "TCC",
+        "Fluoxétine"
+      ],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2024"]
+    }
+
+    {
+      id: "CL2023-002",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Lequel est un syndrome génétique lié à l’X récessif?",
+      choices: [
         "Phénylcétonurie",
         "Wilson",
         "Lesch-Nyhan",
         "Syndrome de Gaucher"
       ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-014",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "31. Repeat : Pour quelle indication allons-nous privilégier un scan cérébral plutôt que l’IRM cérébral?",
-      "options": [
-        "Hémorragie/saignement cérébral aigue",
-        "Sclérose en plaques",
-        "?",
-        "?"
+      id: "CL2023-031",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Pour quelle indication privilégie-t-on un scan cérébral plutôt qu’une IRM cérébrale?",
+      choices: [
+        "Hémorragie cérébrale aiguë",
+        "Sclérose en plaques"
       ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-015",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "45. Repeat : Patient végétalien x qq mois, qui prend de la vitamine D et oméga-3. Développe des troubles de mémoire, dépression, irritabilité. Qu’est-ce qui est en cause comme déficit nutritionnel? 1. B12 2. Calcium 53. Comment appelle-t-on le phénomène expliquant la survenue de symptômes psychotiques/de l’humeur suite à la résolution d’un convulsion ou la correction d’une crise d’épilepsie ?",
-      "options": [
+      id: "CL2023-045",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Patient végétalien depuis quelques mois, prend vitamine D et oméga-3. Développe troubles de mémoire, dépression et irritabilité. Quel déficit nutritionnel est en cause?",
+      choices: [
+        "Vitamine B12",
+        "Calcium"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
+    },
+
+    {
+      id: "CL2023-053",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Comment appelle-t-on le phénomène expliquant la survenue de symptômes psychotiques ou thymiques suite à la résolution d’une convulsion ou à la correction d’une crise d’épilepsie?",
+      choices: [
         "Normalisation forcée",
         "Fregoli",
         "Effet Sprague"
       ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-016",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "57. Description d’un patient hospitalisé qui a tableau délire grandiose, labilité émotionnelle et autres sx psy + développe symptômes cognitifs et dysfonction exécutive. Pas de mention de symptômes moteurs. Nous dise que le patient a des relations sexuelles avec d’autres hommes et consomme un peu d’alcool la fin de semaine. Il a eu divers bilans qui sont tous normaux incluant une sérologie VIH négative. Sv normaux. Pas de fièvre. Quel test sérologique serait le plus utile à effectuer en premier pour ce patient ?",
-      "options": [
+      id: "CL2023-057",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Patient hospitalisé avec délire grandiose, labilité émotionnelle, symptômes psychiatriques, atteinte cognitive progressive et dysfonction exécutive. Relations sexuelles avec hommes, VIH négatif, bilans normaux, signes vitaux normaux, pas de fièvre. Quel test sérologique serait le plus utile en premier?",
+      choices: [
         "VDRL",
         "Anticorps NMDA",
         "Calcium"
       ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-017",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "67. On décrit diverses trouvailles chez un patient à l’imagerie par IRM et à l’EEG. On parle d’un kyste arachnoïdien et d’un hypersignal temporo-médiale en T2 à l’IRM. On parle d’un rythme de fond alpha et de pointes occasionnelles de 20-30 Hz à EEG. Quelle trouvaille serait la plus suggestive d'une encéphalite auto-immune ?",
-      "options": [
+      id: "CL2023-067",
+      source: "CL 2023",
+      year: 2023,
+      stem: "IRM montre un kyste arachnoïdien et un hypersignal temporo-médial en T2. EEG montre rythme alpha de fond et pointes occasionnelles 20–30 Hz. Quelle trouvaille est la plus suggestive d’encéphalite auto-immune?",
+      choices: [
         "Kyste arachnoïdien",
-        "Hypersignal temporo-médial en T2 à IRM",
-        "Rythme de fond alpha à EEG",
-        "Pointes occasionnelles de 20-30 Hz à EEG."
+        "Hypersignal temporo-médial en T2 à l’IRM",
+        "Rythme alpha à l’EEG",
+        "Pointes 20–30 Hz à l’EEG"
       ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-018",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "Kelly, M. J., Grant, E., Murchison, A. G., Binks, S., Ramanathan, S., Michael, S., ... & Irani, S. R. (2024). Magnetic resonance imaging characteristics of LGI1-antibody and CASPR2-antibody encephalitis. JAMA neurology, 81(5), 525-533. 68. Patient de 60 ans MAB traité pour une manie. À la sortie de l’hospitalisation, il perdure des déficits cognitifs au niveau des fonctions exécutives et de la mémoire. Les enfants nous disent que cela s’est installé progressivement dans les deux dernières années. Quel test imagerie fonctionnelle nous permettrait de préciser le diagnostic ?",
-      "options": [
+      id: "CL2023-068",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Patient de 60 ans MAB traité pour manie, persistance de déficits cognitifs exécutifs et mnésiques progressifs depuis deux ans. Quel test d’imagerie fonctionnelle aiderait à préciser le diagnostic?",
+      choices: [
         "TEP FDG",
         "TEP plaques amyloïdes",
         "DAT SCAN",
-        "SPECT pour voir variation de flot sanguin dans les différentes régions du cerveau"
+        "SPECT"
       ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-019",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "84. Un patient a reçu diagnostic d’apnée obstructive du sommeil. Sa femme décrit également qu’il est agité ++ la nuit et qui bouge en frappant autour de lui lorsqu’il est endormi. Cela devient dangereux pour celle-ci. Il ne se rappellerait pas de ses rêves rendu au matin. Quel test serait approprié à ce stable pour son trouble du sommeil ?",
-      "options": [
+      id: "CL2023-084",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Patient avec apnée obstructive du sommeil. Sa femme décrit agitation nocturne importante avec mouvements violents. Aucun souvenir de rêves le matin. Quel test est approprié?",
+      choices: [
         "Test d’apnée du sommeil",
         "Test du sommeil à domicile",
         "Polysomnographie",
-        "Polysomnographie avec test de latence de sommeil"
+        "Polysomnographie avec test de latence"
       ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     },
+
     {
-      "id": "CL-020",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2023,
-      "category": "CL",
-      "stem": "103. Description d’un syndrome sérotoninergique avec diaphorèse, hyperthermie, hyperréflexie, sx GI, etc. Prise de Millepertuis, citalopram, ketoconazole, triptans. On demande quel serait le meilleur traitement après l’arrêt des agents en cause et l’hydratation/traitement de support ?",
-      "options": [
+      id: "CL2023-103",
+      source: "CL 2023",
+      year: 2023,
+      stem: "Syndrome sérotoninergique avec diaphorèse, hyperthermie, hyperréflexie, symptômes GI. Prise de millepertuis, citalopram, kétoconazole, triptans. Quel est le meilleur traitement après arrêt des agents et support?",
+      choices: [
         "Cyproheptadine",
         "Bromocriptine",
         "Dantrolène",
         "Flumazénil"
       ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2023"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-021",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "6. pt blessé médullaire C6 ASIA B a des douleurs post trauma recoit gabapentin 1800 mg mais a encore des douleurs. Quelle médication vous pourriez ajouter ?",
-      "options": [
-        "pregabalin",
-        "nortriptyline",
-        "escitalopram",
-        "topiramate"
-      ],
-      "answerIndex": 1,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-022",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "9. Repeat 2 jours post-op gallbladder, sx clairs de délirium avec dysautonomie et subfebrile, FSC/CBC montre “slightly elevated MCV”. Il a une GGT augmenté. Il est en sueur, palpitation, tremblement, nausées, fièvreux. Qu'est-ce qui explique le plus probablement son délirium?",
-      "options": [
-        "sevrage d’alcool",
-        "sepsis",
-        "carence vitamine B12",
-        "hépatite aiguë (ou encéphalite)"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-023",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "10. 3 jours post op d’un pt connu bipolaire type 1 qui était stable sous lithium, vous vous rendez compte que le chirurgien a cessé le lithium en pré-op. Description du pt : mutisme, autres sx: avait périodes d’agitation…. .. Comment différencier une cause médicale vs cause psychiatrique (rechute)?",
-      "options": [
-        "EEG",
-        "vérifier la lithémie pré-op",
-        "IRM",
-        "GGT"
-      ],
-      "answerIndex": 0,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-024",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "12. Homme fin vingtaine se présente à l’urgence avec psychose, agitation, dysarthrie, tremblements, ictérique; il bavait. Pas d’antécédents psychiatriques. Aux bilans, il a des transaminases légèrement augmentées, une hémolyse, une ceruloplasmine diminuée à 0,1 (N plus grand ou égal à 0,2), collecte urinaire de cuivre 24 h N. Quelle est LA PROCHAINE étape la plus pertinente ?",
-      "options": [
-        "contacter le neurologue pour PL",
-        "contacter le gastro pour une biopsie du foie",
-        "contacter ophtalmo pour un examen à lampe à fente",
-        "contacter hemato pour une biopsie de la moelle"
-      ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-025",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "54. Une patiente vient de subir une chirurgie pour un cancer du sein et a un traitement continu au tamoxifène. Elle présente une dépression avec fatigue et manque d’énergie important. Quel serait le meilleur choix d’antidépresseur pour elle?",
-      "options": [
-        "paroxétine",
-        "fluoxétine",
-        "citalopram",
-        "bupropion"
-      ],
-      "answerIndex": 2,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
-    },
-    {
-      "id": "CL-026",
-      "source": "CONSULTATION - LIAISON.docx",
-      "year": 2021,
-      "category": "CL",
-      "stem": "64 Homme mécanicien, en arrêt de travail pour douleurs au cou à cause d’un accident de travail il y a cinq ans. Durant une séance de physiothérapie, il devient subitement paralysé des deux jambes, ça dure dans le temps mais il finit par retrouver l’usage de ses orteils. Il est référé à l’urgence en neurologie. Les neurologues ne trouvent aucune explication médicale et aucune lésion à l’imagerie. Le patient a hâte de rentrer chez lui (en français) vs anxious to go home (en anglais). Dx le plus probable ?",
-      "options": [
-        "simulation",
-        "trouble factice",
-        "trouble à symptomatologie somatique",
-        "trouble de conversion"
-      ],
-      "answerIndex": 3,
-      "tags": [
-        "cl",
-        "consultation-liaison",
-        "year-2021"
-      ],
-      "needsReview": false
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2023"]
     }
+// /banks/bank-cl-2022.js
+window.QUIZ_BANKS = window.QUIZ_BANKS || {};
+
+window.QUIZ_BANKS["CL 2022"] = {
+  label: "CL 2022",
+  questions: [
+
+    {
+      id: "CL2022-001",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Patient à l’urgence ne comprend pas les consignes, parle avec débit normal mais discours incompréhensible, difficulté à répéter, absence de conscience du déficit. Quel est le diagnostic?",
+      choices: [
+        "Aphasie de Broca",
+        "Aphasie de Wernicke",
+        "Aphasie de Conduction",
+        "Aphasie globale"
+      ],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-002",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Quel test est le plus spécifique pour évaluer les fonctions exécutives?",
+      choices: [
+        "Boston Naming Test",
+        "Trail Making Test",
+        "Série de Luria",
+        "Gestalt"
+      ],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-003",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Quelle est l’utilité de l’IRM fonctionnelle en recherche?",
+      choices: [
+        "Captation du glucose",
+        "Analyse de saignement",
+        "Observer calcifications",
+        "Taux d’oxygénation et flot sanguin"
+      ],
+      answerIndex: 3,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-006",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Patiente avec céphalées convaincue d’avoir une maladie et incapable d’aller travailler. Quel est le diagnostic?",
+      choices: [
+        "Trouble à symptomatologie somatique",
+        "Crainte excessive d’avoir une maladie",
+        "Conversion",
+        "Trouble factice"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-007",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Homme hospitalisé pour épilepsie. Après stabilisation neurologique, développe agressivité et irritabilité. Quelle est la cause?",
+      choices: [
+        "Levetiracetam (Keppra)",
+        "Capsaïcine trop forte",
+        "Correction forcée de l’EEG",
+        "Manie induite par opiacés"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-008",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Pour quelle indication privilégie-t-on un scan cérébral plutôt qu’une IRM?",
+      choices: [
+        "Hémorragie cérébrale aiguë",
+        "Sclérose en plaques",
+        "Tumeur cérébrale",
+        "Autre"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-009",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Patient en ECT 3x/semaine débute Abilify et Sertraline. Après le 3e traitement, confusion plusieurs heures plus tard. SV normaux. Quelle est la première étape?",
+      choices: [
+        "Diminuer fréquence des ECT",
+        "Faire un bilan de délirium",
+        "Cesser Sertraline",
+        "Cesser Abilify"
+      ],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-010",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Dans quelle condition doit-on faire un EEG lors de l’évaluation initiale?",
+      choices: [
+        "Catatonie chez une femme de 40 ans",
+        "Premier épisode de psychose chez un patient de 20 ans",
+        "Suspicion intoxication au lithium chez une patiente MAB",
+        "Démence de novo chez une femme de 70 ans"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-011",
+      source: "CL 2022",
+      year: 2022,
+      stem: "Quelle structure est impliquée dans l’activation de la peur, l’attachement et les émotions positives?",
+      choices: [
+        "Amygdale"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    },
+
+    {
+      id: "CL2022-012",
+      source: "CL 2022",
+      year: 2022,
+      stem: "What is the diagnostic test to confirm anti-NMDA receptor encephalitis?",
+      choices: [
+        "IgG specific assay in CSF",
+        "IgM specific assay in blood",
+        "EEG abnormalities",
+        "Specific MRI abnormalities"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2022"]
+    }
+// /banks/bank-cl-2021.js
+window.QUIZ_BANKS = window.QUIZ_BANKS || {};
+
+window.QUIZ_BANKS["CL 2021"] = {
+  label: "CL 2021",
+  questions: [
+
+    {
+      id: "CL2021-006",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Patient blessé médullaire C6 ASIA B avec douleurs post-traumatiques malgré gabapentin 1800 mg. Quelle médication peut être ajoutée?",
+      choices: ["Pregabalin", "Nortriptyline", "Escitalopram", "Topiramate"],
+      answerIndex: 1,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-009",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Deux jours post-op cholécystectomie, délirium avec dysautonomie, subfébrile, MCV élevé, GGT augmentée, sueurs, palpitations, tremblements, nausées. Quelle est la cause la plus probable?",
+      choices: ["Sevrage d’alcool", "Sepsis", "Carence en vitamine B12", "Hépatite aiguë"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-010",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Trois jours post-op chez un patient bipolaire type I dont le lithium a été cessé en pré-op. Mutisme et agitation. Comment différencier cause médicale vs psychiatrique?",
+      choices: ["EEG", "Vérifier lithémie pré-op", "IRM", "GGT"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-012",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Homme fin vingtaine avec psychose, dysarthrie, tremblements, ictère, hypersalivation. Transaminases élevées, hémolyse, céruloplasmine basse. Prochaine étape?",
+      choices: [
+        "Contacter neurologue pour PL",
+        "Biopsie hépatique",
+        "Examen ophtalmologique à la lampe à fente",
+        "Biopsie moelle"
+      ],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-054",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Patiente sous tamoxifène pour cancer du sein, présente dépression et fatigue. Quel antidépresseur choisir?",
+      choices: ["Paroxétine", "Fluoxétine", "Citalopram", "Bupropion"],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-064",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Homme avec douleurs cervicales chroniques développe paralysie soudaine des jambes en physiothérapie, imagerie normale, neurologues trouvent rien. Diagnostic?",
+      choices: ["Simulation", "Trouble factice", "Trouble à symptomatologie somatique", "Trouble de conversion"],
+      answerIndex: 3,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-082",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Patient post-commotion cérébrale avec insomnie persistante sans anxiété ni cauchemars. Mélatonine inefficace. Que prescrire?",
+      choices: ["Trazodone", "Temazepam", "Zopiclone", "Prazosin"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-088",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Patient ne comprend pas consignes, parle normalement mais discours incompréhensible, difficulté à répéter, absence de conscience du déficit. Diagnostic?",
+      choices: ["Aphasie de conduction", "Aphasie globale", "Aphasie réceptive", "Aphasie expressive"],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-089",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Patient sans aphasie, lorsqu’on lui demande de se brosser les cheveux, il met les doigts dans ses cheveux; lorsqu’on lui demande de démontrer boire avec une paille, il souffle. Diagnostic?",
+      choices: ["Dyspraxie idéomotrice", "Apraxie constructive", "Dysmnésie", "Dysgnosie"],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-090",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Cécité suspectée d’être un trouble de conversion. Quel examen permet de distinguer cause organique vs conversion?",
+      choices: ["EEG", "IRM chiasma optique", "Potentiels évoqués visuels", "Scan de la rétine"],
+      answerIndex: 2,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    },
+
+    {
+      id: "CL2021-117",
+      source: "CL 2021",
+      year: 2021,
+      stem: "Quel est le trouble psychiatrique le plus fréquent chez les patients atteints de cancer?",
+      choices: [
+        "Trouble d’adaptation avec humeur anxieuse ou dépressive",
+        "Trouble dépressif induit par une condition médicale",
+        "Délirium",
+        "TSPT"
+      ],
+      answerIndex: 0,
+      tags: ["cl", "consultation-liaison", "year-2021"]
+    }
+
   ]
 };
