@@ -20,7 +20,7 @@
 </head>
 <body>
   <main class="wrap">
-    <section class="card">
+    <section class="card" id="selectionCard">
       <h1>Sélection des banques</h1>
       <div class="row">
         <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
@@ -29,19 +29,25 @@
 
       <div class="banks" id="banksList"></div>
 
-      <div class="row" style="margin-top:12px">
+      <h1 style="margin-top:20px">Filtrer par thématiques (Tags)</h1>
+      <div class="row">
+        <div class="pill" id="tagTotalPill">Total tags sélectionnés: 0 question</div>
+      </div>
+      <div class="banks" id="tagsList"></div>
+
+      <div class="row" style="margin-top:24px">
         <button id="selectAllBtn" type="button">Tout cocher</button>
         <button id="clearBtn" type="button">Tout décocher</button>
         <button id="startBtn" type="button" disabled>Démarrer le quiz</button>
       </div>
       <p class="muted" style="margin-top:12px;font-size:13px">
-        Le quiz mélangera toutes les questions provenant des banques cochées.
+        Le quiz mélangera toutes les questions provenant des banques et des tags cochés.
       </p>
     </section>
 
     <section class="card" style="margin-top:14px; display:none" id="quizCard">
       <div class="row">
-        <div class="pill" id="progressPill">Case 1</div>
+        <div class="pill" id="progressPill">Question 1</div>
         <div class="pill" id="scorePill">Score: 0 / 0</div>
       </div>
       <h1 class="muted" style="margin-top:12px">Question</h1>
@@ -83,6 +89,7 @@
     <script src="./banks/bank-sommeil.js"></script>
 
     <script src="./banks/bank-usa6.js"></script>
+    <script src="./banks/bank-usax.js"></script>
 
     <script src="./app.js"></script>
   </main>
