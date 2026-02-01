@@ -12,6 +12,7 @@
     clearBtn: document.getElementById("clearBtn"),
 
     quizCard: document.getElementById("quizCard"),
+    selectionCard: document.getElementById("selectionCard"),
     questionText: document.getElementById("questionText"),
     choices: document.getElementById("choices"),
     feedbackText: document.getElementById("feedbackText"),
@@ -76,6 +77,7 @@
 
       const cb = document.createElement("input");
       cb.type = "checkbox";
+      cb.dataset.key = key;
 
       cb.addEventListener("change", () => {
         if (cb.checked) selectedBanks.add(key);
@@ -105,6 +107,7 @@
 
       const cb = document.createElement("input");
       cb.type = "checkbox";
+      cb.dataset.tag = tag;
 
       cb.addEventListener("change", () => {
         if (cb.checked) selectedTags.add(tag);
@@ -131,22 +134,41 @@
     els.tagTotalPill.textContent = `Total tags sélectionnés: ${plural(set.size, "question")}`;
   }
 
-  // ===================== TOTAL =====================
+  // ===================== TOTAL GÉNÉRAL =====================
   function updateTotal() {
-    let bankTotal = 0;
+    const finalSet = new Set();
+    
+    // Ajoute les questions des banques
     selectedBanks.forEach(key => {
-      bankTotal += banks[key].questions.length;
+      banks[key].questions.forEach(q => finalSet.add(q.id));
     });
 
-    const tagSet = new Set();
+    // Ajoute les questions des tags
     selectedTags.forEach(t => {
-      tagIndex.get(t).forEach(q => tagSet.add(q.id));
+      tagIndex.get(t).forEach(q => finalSet.add(q.id));
     });
 
-    const total = bankTotal + tagSet.size;
-    els.totalPill.textContent = `Total sélectionné: ${plural(total, "question")}`;
-    els.startBtn.disabled = total === 0;
+    els.totalPill.textContent = `Total sélectionné: ${plural(finalSet.size, "question")}`;
+    els.startBtn.disabled = finalSet.size === 0;
   }
+
+  // ===================== BOUTONS GLOBAUX =====================
+  els.selectAllBtn.addEventListener("click", () => {
+    els.banksList.querySelectorAll("input").forEach(cb => {
+      cb.checked = true;
+      selectedBanks.add(cb.dataset.key);
+    });
+    updateTotal();
+  });
+
+  els.clearBtn.addEventListener("click", () => {
+    els.banksList.querySelectorAll("input").forEach(cb => cb.checked = false);
+    els.tagsList.querySelectorAll("input").forEach(cb => cb.checked = false);
+    selectedBanks.clear();
+    selectedTags.clear();
+    updateTotal();
+    updateTagTotal();
+  });
 
   // ===================== QUIZ BUILD =====================
   let quizQuestions = [];
@@ -178,7 +200,7 @@
 
     const q = quizQuestions[current];
 
-    els.progressPill.textContent = `Case ${current + 1} / ${quizQuestions.length}`;
+    els.progressPill.textContent = `Question ${current + 1} / ${quizQuestions.length}`;
     els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
     els.questionText.textContent = q.stem;
 
@@ -190,6 +212,7 @@
       btn.style.display = "block";
       btn.style.margin = "8px 0";
       btn.style.width = "100%";
+      btn.style.textAlign = "left";
 
       btn.addEventListener("click", () => handleAnswer(idx));
       els.choices.appendChild(btn);
@@ -202,7 +225,6 @@
 
     const q = quizQuestions[current];
     const correct = q.answerIndex;
-
     const buttons = els.choices.querySelectorAll("button");
 
     buttons.forEach((b, i) => {
@@ -214,13 +236,14 @@
       buttons[idx].style.background = "rgba(231,76,60,.3)";
       els.feedbackText.textContent = "Incorrect.";
     } else {
-      els.feedbackText.textContent = "Correct.";
+      els.feedbackText.textContent = "Correct !";
+      scoreCorrect++;
     }
 
     scoreAnswered++;
-    if (idx === correct) scoreCorrect++;
-
+    els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
     els.nextBtn.disabled = false;
+    if (q.explain) els.explainText.textContent = q.explain;
   }
 
   function nextQuestion() {
@@ -228,9 +251,9 @@
       current++;
       renderQuestion();
     } else {
-      els.questionText.textContent = "Quiz terminé.";
+      els.questionText.textContent = "Quiz terminé !";
       els.choices.innerHTML = "";
-      els.feedbackText.textContent = `Score final: ${scoreCorrect}/${scoreAnswered}`;
+      els.feedbackText.textContent = `Résultat final : ${scoreCorrect} bonnes réponses sur ${quizQuestions.length}.`;
       els.nextBtn.disabled = true;
     }
   }
@@ -238,10 +261,11 @@
   // ===================== NAVIGATION =====================
   els.startBtn.addEventListener("click", () => {
     buildQuiz();
+    if (quizQuestions.length === 0) return;
     current = 0;
     scoreCorrect = 0;
     scoreAnswered = 0;
-    document.querySelector(".card").style.display = "none";
+    els.selectionCard.style.display = "none";
     els.quizCard.style.display = "block";
     renderQuestion();
   });
