@@ -1,6 +1,6 @@
 // app.js
 (function () {
-
+ 
   // ===================== RÉFÉRENCES DOM =====================
   const els = {
     banksList: document.getElementById("banksList"),
