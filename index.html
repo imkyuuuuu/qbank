@@ -108,7 +108,6 @@
       margin: 24px 0;
     }
 
-    /* Style spécifique pour les boutons de choix dans app.js */
     #choices button {
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-main);
@@ -116,6 +115,11 @@
       text-align: left;
       font-weight: 400;
       margin-bottom: 8px;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
     #choices button:hover:not(:disabled) {
@@ -131,16 +135,10 @@
       <h1>Sources d'études</h1>
       <div class="row">
         <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
-        <div class="pill muted">Sélectionnez vos banques</div>
+        <div class="pill muted">Sélectionnez vos banques de questions</div>
       </div>
 
       <div class="banks" id="banksList"></div>
-
-      <h1 style="margin-top:32px">Sujets & Années (Tags)</h1>
-      <div class="row">
-        <div class="pill" id="tagTotalPill">Total tags: 0 question</div>
-      </div>
-      <div class="banks" id="tagsList"></div>
 
       <div class="row" style="margin-top:32px; padding-top: 20px; border-top: 1px solid var(--border-color);">
         <div style="display:flex; gap:10px">
@@ -176,7 +174,6 @@
     <script src="./banks/bank-2023.js"></script>
     <script src="./banks/bank-2024.js"></script>
     <script src="./banks/bank-2025.js"></script>
-
     <script src="./banks/bank-CL.js"></script>
     <script src="./banks/bank-TP.js"></script>
     <script src="./banks/bank-TUS.js"></script>
@@ -194,7 +191,6 @@
     <script src="./banks/bank-psychose.js"></script>
     <script src="./banks/bank-psychotherapie.js"></script>
     <script src="./banks/bank-sommeil.js"></script>
-
     <script src="./banks/bank-usa6.js"></script>
     <script src="./banks/bank-usa5.js"></script>
 
