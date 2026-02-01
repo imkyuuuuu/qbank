@@ -1,8 +1,8 @@
 // /banks/bank-cl-2025.js
 window.QUIZ_BANKS = window.QUIZ_BANKS || {};
 
-window.QUIZ_BANKS["CL 2025"] = {
-  label: "CL 2025",
+window.QUIZ_BANKS["Consultation liaison"] = {
+  label: "CL",
   questions: [
 
     {
