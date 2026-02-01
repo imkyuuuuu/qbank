@@ -1,365 +1,77 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Banque de questions – Psychiatrie</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Quiz Psychiatrie – Multi-banques</title>
   <style>
-    :root{
-      --bg:#0b1020;
-      --card:#121a33;
-      --text:#e9ecf5;
-      --muted:#b7c0dd;
-      --border:rgba(255,255,255,.10);
-      --good:#2ecc71;
-      --bad:#e74c3c;
-      --btn:#1f2a52;
-      --btn2:#2a3a73;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 10% 10%, #18214a 0%, var(--bg) 55%) fixed;
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-    }
-    .app{
-      width:min(920px, 100%);
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid var(--border);
-      border-radius:18px;
-      box-shadow: var(--shadow);
-      padding:22px;
-    }
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-bottom:16px;
-    }
-    .pill{
-      font-size:13px;
-      color:var(--muted);
-      border:1px solid var(--border);
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(0,0,0,.15);
-      white-space:nowrap;
-    }
-    h1{
-      font-size:18px;
-      margin:0 0 10px 0;
-      color:var(--muted);
-      font-weight:600;
-      letter-spacing:.2px;
-    }
-    .question{
-      font-size:20px;
-      line-height:1.35;
-      margin:0 0 16px 0;
-      font-weight:700;
-    }
-    .choices{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      margin: 14px 0 18px;
-    }
-    .choice{
-      border:1px solid var(--border);
-      background: rgba(0,0,0,.18);
-      padding:12px 14px;
-      border-radius:14px;
-      cursor:pointer;
-      transition: transform .05s ease, border-color .15s ease, background .15s ease;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .choice:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); }
-    .choice[aria-disabled="true"]{
-      cursor:default;
-      opacity: .95;
-    }
-    .badge{
-      width:28px; height:28px;
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      border:1px solid var(--border);
-      color:var(--muted);
-      font-weight:700;
-      flex:0 0 auto;
-      background: rgba(255,255,255,.03);
-    }
-    .choice.good{
-      border-color: rgba(46, 204, 113, .75);
-      background: rgba(46, 204, 113, .14);
-    }
-    .choice.bad{
-      border-color: rgba(231, 76, 60, .75);
-      background: rgba(231, 76, 60, .14);
-    }
-    .choice.good .badge{ border-color: rgba(46, 204, 113, .75); color: var(--good); }
-    .choice.bad .badge{ border-color: rgba(231, 76, 60, .75); color: var(--bad); }
-    .choice-text{
-      font-size:16px;
-      line-height:1.25;
-    }
-    .footer{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-    button{
-      border:1px solid var(--border);
-      background: var(--btn);
-      color: var(--text);
-      padding:10px 14px;
-      border-radius:14px;
-      cursor:pointer;
-      font-weight:700;
-      transition: background .15s ease, transform .05s ease, opacity .15s ease;
-    }
-    button:hover{ background: var(--btn2); transform: translateY(-1px); }
-    button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
-    }
-    .note{
-      color: var(--muted);
-      font-size:13px;
-      line-height:1.3;
-    }
-    .small{
-      font-size:12px;
-      color: var(--muted);
-    }
-    .divider{
-      height:1px;
-      background: var(--border);
-      margin: 10px 0 14px;
-    }
+    body{margin:0;font-family:system-ui;background:#0b1020;color:#e9ecf5;display:flex;justify-content:center;padding:24px}
+    .wrap{width:min(960px,100%)}
+    .card{background:#121a33;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px}
+    h1{margin:0 0 12px 0;font-size:20px}
+    .banks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+    .bank{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
+    .muted{color:#b7c0dd}
+    button{border:1px solid rgba(255,255,255,.1);background:#1f2a52;color:#e9ecf5;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+    .pill{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.2);font-size:13px}
   </style>
 </head>
 <body>
-  <main class="app">
-    <section class="card" aria-live="polite">
-      <div class="topbar">
+  <main class="wrap">
+    <section class="card">
+      <h1>Sélection des banques</h1>
+      <div class="row">
+        <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
+        <div class="pill muted" id="infoPill">Coche une ou plusieurs banques</div>
+      </div>
+
+      <div class="banks" id="banksList"></div>
+
+      <div class="row" style="margin-top:12px">
+        <button id="selectAllBtn" type="button">Tout cocher</button>
+        <button id="clearBtn" type="button">Tout décocher</button>
+        <button id="startBtn" type="button" disabled>Démarrer le quiz</button>
+      </div>
+      <p class="muted" style="margin-top:12px;font-size:13px">
+        Le quiz mélangera toutes les questions provenant des banques cochées.
+      </p>
+    </section>
+
+    <section class="card" style="margin-top:14px; display:none" id="quizCard">
+      <div class="row">
         <div class="pill" id="progressPill">Case 1</div>
         <div class="pill" id="scorePill">Score: 0 / 0</div>
       </div>
+      <h1 class="muted" style="margin-top:12px">Question</h1>
+      <p id="questionText" style="font-size:20px;font-weight:800;line-height:1.35;margin:10px 0 12px 0">—</p>
+      <div id="choices"></div>
 
-      <h1 id="subtitle">Question</h1>
-      <p class="question" id="questionText">—</p>
-
-      <div class="choices" id="choices"></div>
-
-      <div class="divider"></div>
-
-      <div class="footer">
-        <div class="note" id="feedbackText">Clique une réponse pour voir la correction.</div>
-        <div style="display:flex; gap:10px;">
-          <button id="resetBtn" type="button">Recommencer (mélanger)</button>
+      <div class="row" style="margin-top:14px">
+        <div class="muted" id="feedbackText">Clique une réponse pour voir la correction.</div>
+        <div style="display:flex;gap:10px">
+          <button id="backHomeBtn" type="button">Retour</button>
           <button id="nextBtn" type="button" disabled>Suivant</button>
         </div>
       </div>
-
-      <p class="small" style="margin-top:12px;">
-        Astuce : tu peux ajouter autant de questions que tu veux dans <code>QUESTION_BANK</code>.
-      </p>
+      <p class="muted" style="margin-top:10px;font-size:13px" id="explainText"></p>
     </section>
+
+    <!-- Chargement des banques -->
+    <script src="./banks/bank-2025.js"></script>
+    <script src="./banks/bank-2024.js"></script>
+    <script src="./banks/bank-2023.js"></script>
+    <script src="./banks/bank-2022.js"></script>
+    <script src="./banks/bank-2021.js"></script>
+    <script src="./banks/bank-cope-2025.js"></script>
+    <script src="./banks/bank-usa-1.js"></script>
+    <script src="./banks/bank-usa-2.js"></script>
+    <script src="./banks/bank-usa-3.js"></script>
+    <script src="./banks/bank-usa-4.js"></script>
+    <script src="./banks/bank-usa-5.js"></script>
+
+    <script src="./app.js"></script>
   </main>
-
-  <script>
-    /**
-     * Banque de questions:
-     * - "stem": l'énoncé
-     * - "choices": tableau de réponses
-     * - "answerIndex": index (0-based) de la bonne réponse
-     * - "caseLabel": optionnel (ex. "Case 12"). Si absent, on affichera "Case X" selon la progression.
-     */
-    const QUESTION_BANK = [
-      {
-        stem: "Un homme de 36 ans présente rigidité en « tuyau de plomb », hyperthermie et CK élevée après neuroleptiques. Quel signe est le plus en faveur d’un syndrome malin des neuroleptiques?",
-        choices: [
-          "Hyporéflexie",
-          "Taux élevé de créatine kinase",
-          "Hyperthermie",
-          "Rigidité généralisée"
-        ],
-        answerIndex: 0,
-        caseLabel: "Case 1"
-      },
-      {
-        stem: "Quel neurotransmetteur est principalement responsable des symptômes physiques du sevrage aux opioïdes?",
-        choices: ["Acétylcholine", "Dopamine", "Noradrénaline", "Sérotonine"],
-        answerIndex: 2,
-        caseLabel: "Case 2"
-      }
-      // ✅ Ajoute ici tes questions
-    ];
-
-    // --- État de l'application ---
-    let order = [];
-    let current = 0;
-    let locked = false;
-    let scoreCorrect = 0;
-    let scoreTotalAnswered = 0;
-
-    const els = {
-      progressPill: document.getElementById("progressPill"),
-      scorePill: document.getElementById("scorePill"),
-      subtitle: document.getElementById("subtitle"),
-      questionText: document.getElementById("questionText"),
-      choices: document.getElementById("choices"),
-      feedbackText: document.getElementById("feedbackText"),
-      nextBtn: document.getElementById("nextBtn"),
-      resetBtn: document.getElementById("resetBtn")
-    };
-
-    function shuffle(array){
-      // Fisher-Yates
-      const a = array.slice();
-      for (let i = a.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function initQuiz(){
-      if (!Array.isArray(QUESTION_BANK) || QUESTION_BANK.length === 0){
-        els.questionText.textContent = "Aucune question dans la banque.";
-        els.choices.innerHTML = "";
-        els.feedbackText.textContent = "Ajoute des questions à QUESTION_BANK.";
-        els.nextBtn.disabled = true;
-        return;
-      }
-
-      order = shuffle([...Array(QUESTION_BANK.length).keys()]);
-      current = 0;
-      locked = false;
-      scoreCorrect = 0;
-      scoreTotalAnswered = 0;
-      renderQuestion();
-      updateScore();
-    }
-
-    function updateScore(){
-      els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreTotalAnswered}`;
-    }
-
-    function renderQuestion(){
-      locked = false;
-      els.nextBtn.disabled = true;
-      els.feedbackText.textContent = "Clique une réponse pour voir la correction.";
-
-      const q = QUESTION_BANK[order[current]];
-      const caseLabel = q.caseLabel ? q.caseLabel : `Case ${current + 1}`;
-
-      els.progressPill.textContent = `${caseLabel} (${current + 1}/${QUESTION_BANK.length})`;
-      els.subtitle.textContent = "Question";
-      els.questionText.textContent = q.stem;
-
-      els.choices.innerHTML = "";
-
-      q.choices.forEach((choiceText, idx) => {
-        const btn = document.createElement("div");
-        btn.className = "choice";
-        btn.setAttribute("role", "button");
-        btn.setAttribute("tabindex", "0");
-        btn.setAttribute("aria-disabled", "false");
-
-        const badge = document.createElement("div");
-        badge.className = "badge";
-        badge.textContent = String.fromCharCode(65 + idx); // A, B, C...
-
-        const text = document.createElement("div");
-        text.className = "choice-text";
-        text.textContent = choiceText;
-
-        btn.appendChild(badge);
-        btn.appendChild(text);
-
-        const onSelect = () => handleAnswer(idx);
-        btn.addEventListener("click", onSelect);
-        btn.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onSelect();
-          }
-        });
-
-        els.choices.appendChild(btn);
-      });
-    }
-
-    function handleAnswer(selectedIdx){
-      if (locked) return;
-      locked = true;
-
-      const q = QUESTION_BANK[order[current]];
-      const correctIdx = q.answerIndex;
-
-      // Marquer bon / mauvais
-      const nodes = Array.from(els.choices.children);
-
-      nodes.forEach((node, idx) => {
-        node.setAttribute("aria-disabled", "true");
-        node.setAttribute("tabindex", "-1");
-        if (idx === correctIdx) node.classList.add("good");
-      });
-
-      if (selectedIdx !== correctIdx){
-        nodes[selectedIdx].classList.add("bad");
-        els.feedbackText.textContent = "Réponse incorrecte. La bonne réponse est en vert.";
-      } else {
-        els.feedbackText.textContent = "Réponse correcte.";
-      }
-
-      // Score
-      scoreTotalAnswered += 1;
-      if (selectedIdx === correctIdx) scoreCorrect += 1;
-      updateScore();
-
-      // Autoriser suivant
-      els.nextBtn.disabled = false;
-      els.nextBtn.focus();
-    }
-
-    function nextQuestion(){
-      if (current < QUESTION_BANK.length - 1){
-        current += 1;
-        renderQuestion();
-      } else {
-        // Fin
-        els.progressPill.textContent = `Terminé (${QUESTION_BANK.length}/${QUESTION_BANK.length})`;
-        els.subtitle.textContent = "Résultat";
-        els.questionText.textContent = "Fin du questionnaire.";
-        els.choices.innerHTML = "";
-        els.feedbackText.textContent = `Score final: ${scoreCorrect} / ${scoreTotalAnswered}.`;
-        els.nextBtn.disabled = true;
-      }
-    }
-
-    els.nextBtn.addEventListener("click", nextQuestion);
-    els.resetBtn.addEventListener("click", initQuiz);
-
-    initQuiz();
-  </script>
 </body>
 </html>
