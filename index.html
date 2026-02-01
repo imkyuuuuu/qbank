@@ -3,65 +3,168 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Quiz Psychiatrie – Multi-banques</title>
+  <title>Quiz Psychiatrie – Préparation Collège Royal</title>
   <style>
-    body{margin:0;font-family:system-ui;background:#0b1020;color:#e9ecf5;display:flex;justify-content:center;padding:24px}
-    .wrap{width:min(960px,100%)}
-    .card{background:#121a33;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px}
-    h1{margin:0 0 12px 0;font-size:20px}
-    .banks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
-    .bank{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
-    .muted{color:#b7c0dd}
-    button{border:1px solid rgba(255,255,255,.1);background:#1f2a52;color:#e9ecf5;padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
-    button:disabled{opacity:.5;cursor:not-allowed}
-    .row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
-    .pill{border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:6px 10px;background:rgba(0,0,0,.2);font-size:13px}
+    /* Thème Clair & Médical */
+    :root {
+      --bg-color: #f4f7f9;
+      --card-bg: #ffffff;
+      --primary-blue: #2c5282;
+      --accent-blue: #ebf8ff;
+      --text-main: #2d3748;
+      --text-muted: #718096;
+      --border-color: #e2e8f0;
+      --success: #38a169;
+      --error: #e53e3e;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .wrap { width: min(900px, 100%); }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 22px;
+      color: var(--primary-blue);
+      border-bottom: 2px solid var(--accent-blue);
+      padding-bottom: 8px;
+    }
+
+    .banks {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .bank {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .bank:hover { background: var(--accent-blue); }
+
+    .muted { color: var(--text-muted); font-size: 0.9em; }
+
+    button {
+      border: 1px solid var(--primary-blue);
+      background: var(--primary-blue);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover { opacity: 0.9; }
+    button:disabled { background: var(--border-color); border-color: var(--border-color); cursor: not-allowed; }
+
+    #clearBtn { background: white; color: var(--text-main); border-color: var(--border-color); }
+    #selectAllBtn { background: var(--accent-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
+
+    .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+    .pill {
+      border-radius: 999px;
+      padding: 6px 14px;
+      background: var(--accent-blue);
+      color: var(--primary-blue);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Style des questions */
+    #questionText {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      margin: 20px 0;
+      color: var(--text-main);
+    }
+
+    .choice-btn {
+      text-align: left;
+      background: white;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+      width: 100%;
+      display: block;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: var(--accent-blue);
+      border-color: var(--primary-blue);
+    }
   </style>
 </head>
 <body>
   <main class="wrap">
+    
     <section class="card" id="selectionCard">
       <h1>Sélection des banques</h1>
       <div class="row">
         <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
-        <div class="pill muted" id="infoPill">Coche une ou plusieurs banques</div>
+        <div class="pill muted">Cochez vos sources d'études</div>
       </div>
 
       <div class="banks" id="banksList"></div>
 
-      <h1 style="margin-top:20px">Filtrer par thématiques (Tags)</h1>
+      <h1 style="margin-top:30px">Filtrer par thématiques (Tags)</h1>
       <div class="row">
         <div class="pill" id="tagTotalPill">Total tags sélectionnés: 0 question</div>
       </div>
       <div class="banks" id="tagsList"></div>
 
-      <div class="row" style="margin-top:24px">
-        <button id="selectAllBtn" type="button">Tout cocher</button>
-        <button id="clearBtn" type="button">Tout décocher</button>
-        <button id="startBtn" type="button" disabled>Démarrer le quiz</button>
+      <div class="row" style="margin-top:30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+        <div style="display:flex; gap:10px">
+          <button id="selectAllBtn" type="button">Tout cocher</button>
+          <button id="clearBtn" type="button">Tout décocher</button>
+        </div>
+        <button id="startBtn" type="button" disabled>Démarrer l'entraînement</button>
       </div>
-      <p class="muted" style="margin-top:12px;font-size:13px">
-        Le quiz mélangera toutes les questions provenant des banques et des tags cochés.
-      </p>
     </section>
 
-    <section class="card" style="margin-top:14px; display:none" id="quizCard">
+    <section class="card" style="display:none" id="quizCard">
       <div class="row">
         <div class="pill" id="progressPill">Question 1</div>
         <div class="pill" id="scorePill">Score: 0 / 0</div>
       </div>
-      <h1 class="muted" style="margin-top:12px">Question</h1>
-      <p id="questionText" style="font-size:20px;font-weight:800;line-height:1.35;margin:10px 0 12px 0">—</p>
+      
+      <p id="questionText">—</p>
+      
       <div id="choices"></div>
 
-      <div class="row" style="margin-top:14px">
-        <div class="muted" id="feedbackText">Clique une réponse pour voir la correction.</div>
-        <div style="display:flex;gap:10px">
-          <button id="backHomeBtn" type="button">Retour</button>
+      <div class="row" style="margin-top:24px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+        <div id="feedbackText" style="font-weight: 600;">Choisissez une réponse.</div>
+        <div style="display:flex; gap:10px">
+          <button id="backHomeBtn" type="button" style="background:#e2e8f0; color:#2d3748; border:none;">Retour</button>
           <button id="nextBtn" type="button" disabled>Suivant</button>
         </div>
       </div>
-      <p class="muted" style="margin-top:10px;font-size:13px" id="explainText"></p>
+      <p class="muted" style="margin-top:15px; font-style: italic;" id="explainText"></p>
     </section>
 
     <script src="./banks/bank-2021.js"></script>
