@@ -207,7 +207,7 @@ window.QUIZ_BANKS["Consultation liaison"] = {
       ],
       answerIndex: 1,
       tags: ["cl", "consultation-liaison", "year-2024"]
-    }
+    },
 
     {
       id: "CL2023-002",
@@ -336,13 +336,8 @@ window.QUIZ_BANKS["Consultation liaison"] = {
       ],
       answerIndex: 0,
       tags: ["cl", "consultation-liaison", "year-2023"]
-    }
-// /banks/bank-cl-2022.js
-window.QUIZ_BANKS = window.QUIZ_BANKS || {};
+    },
 
-window.QUIZ_BANKS["CL 2022"] = {
-  label: "CL 2022",
-  questions: [
 
     {
       id: "CL2022-001",
@@ -489,13 +484,8 @@ window.QUIZ_BANKS["CL 2022"] = {
       ],
       answerIndex: 0,
       tags: ["cl", "consultation-liaison", "year-2022"]
-    }
-// /banks/bank-cl-2021.js
-window.QUIZ_BANKS = window.QUIZ_BANKS || {};
+    },
 
-window.QUIZ_BANKS["CL 2021"] = {
-  label: "CL 2021",
-  questions: [
 
     {
       id: "CL2021-006",
