@@ -1,26 +1,35 @@
 // app.js
 (function () {
-  const banks = (window.QUIZ_BANKS || {});
-  const bankKeys = Object.keys(banks);
 
+  // ===================== RÉFÉRENCES DOM =====================
   const els = {
     banksList: document.getElementById("banksList"),
+    tagsList: document.getElementById("tagsList"),
     totalPill: document.getElementById("totalPill"),
+    tagTotalPill: document.getElementById("tagTotalPill"),
     startBtn: document.getElementById("startBtn"),
     selectAllBtn: document.getElementById("selectAllBtn"),
     clearBtn: document.getElementById("clearBtn"),
+
     quizCard: document.getElementById("quizCard"),
     questionText: document.getElementById("questionText"),
     choices: document.getElementById("choices"),
     feedbackText: document.getElementById("feedbackText"),
-    nextBtn: document.getElementById("nextBtn"),
-    scorePill: document.getElementById("scorePill"),
+    explainText: document.getElementById("explainText"),
     progressPill: document.getElementById("progressPill"),
+    scorePill: document.getElementById("scorePill"),
+    nextBtn: document.getElementById("nextBtn"),
     backHomeBtn: document.getElementById("backHomeBtn"),
-    explainText: document.getElementById("explainText")
   };
 
-  // --- Utilitaires ---
+  // ===================== DONNÉES =====================
+  const banks = window.QUIZ_BANKS || {};
+  const bankKeys = Object.keys(banks);
+
+  const selectedBanks = new Set();
+  const selectedTags = new Set();
+
+  // ===================== UTILS =====================
   function shuffle(array) {
     const a = array.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -34,216 +43,215 @@
     return n === 1 ? `${n} ${word}` : `${n} ${word}s`;
   }
 
-  // --- UI sélection des banques ---
-  const selected = new Set();
-
-  function renderBanks() {
-    if (bankKeys.length === 0) {
-      els.banksList.innerHTML = `<div class="muted">Aucune banque chargée.</div>`;
-      return;
+  // ===================== TAG INDEX =====================
+  function buildTagIndex() {
+    const map = new Map();
+    for (const key of bankKeys) {
+      const qs = banks[key]?.questions || [];
+      for (const q of qs) {
+        const tags = Array.isArray(q.tags) ? q.tags : [];
+        for (let t of tags) {
+          t = String(t).toLowerCase().trim();
+          if (!map.has(t)) map.set(t, []);
+          map.get(t).push(q);
+        }
+      }
     }
+    return map;
+  }
 
+  const tagIndex = buildTagIndex();
+  const allTags = Array.from(tagIndex.keys()).sort();
+
+  // ===================== UI BANQUES =====================
+  function renderBanks() {
     els.banksList.innerHTML = "";
-    bankKeys.forEach((key) => {
+
+    bankKeys.forEach(key => {
       const bank = banks[key];
-      const count = (bank.questions || []).length;
+      const count = bank.questions.length;
 
       const row = document.createElement("label");
       row.className = "bank";
 
       const cb = document.createElement("input");
       cb.type = "checkbox";
-      cb.dataset.bankKey = key;
+
       cb.addEventListener("change", () => {
-        if (cb.checked) selected.add(key);
-        else selected.delete(key);
+        if (cb.checked) selectedBanks.add(key);
+        else selectedBanks.delete(key);
         updateTotal();
       });
 
       const text = document.createElement("div");
-      text.innerHTML = `<div style="font-weight:800">${bank.label || key}</div>
-                        <div class="muted" style="font-size:13px">${plural(count, "question")}</div>`;
+      text.innerHTML = `<div style="font-weight:800">${bank.label}</div>
+                        <div class="muted">${plural(count, "question")}</div>`;
 
       row.appendChild(cb);
       row.appendChild(text);
       els.banksList.appendChild(row);
     });
-
-    updateTotal();
   }
 
+  // ===================== UI TAGS =====================
+  function renderTags() {
+    els.tagsList.innerHTML = "";
+
+    allTags.forEach(tag => {
+      const count = tagIndex.get(tag).length;
+
+      const row = document.createElement("label");
+      row.className = "bank";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+
+      cb.addEventListener("change", () => {
+        if (cb.checked) selectedTags.add(tag);
+        else selectedTags.delete(tag);
+        updateTotal();
+        updateTagTotal();
+      });
+
+      const text = document.createElement("div");
+      text.innerHTML = `<div style="font-weight:800">#${tag}</div>
+                        <div class="muted">${plural(count, "question")}</div>`;
+
+      row.appendChild(cb);
+      row.appendChild(text);
+      els.tagsList.appendChild(row);
+    });
+  }
+
+  function updateTagTotal() {
+    const set = new Set();
+    selectedTags.forEach(t => {
+      tagIndex.get(t).forEach(q => set.add(q.id));
+    });
+    els.tagTotalPill.textContent = `Total tags sélectionnés: ${plural(set.size, "question")}`;
+  }
+
+  // ===================== TOTAL =====================
   function updateTotal() {
-    let total = 0;
-    selected.forEach((key) => {
-      total += (banks[key]?.questions?.length || 0);
+    let bankTotal = 0;
+    selectedBanks.forEach(key => {
+      bankTotal += banks[key].questions.length;
     });
 
+    const tagSet = new Set();
+    selectedTags.forEach(t => {
+      tagIndex.get(t).forEach(q => tagSet.add(q.id));
+    });
+
+    const total = bankTotal + tagSet.size;
     els.totalPill.textContent = `Total sélectionné: ${plural(total, "question")}`;
     els.startBtn.disabled = total === 0;
   }
 
-  els.selectAllBtn.addEventListener("click", () => {
-    selected.clear();
-    document.querySelectorAll('input[type="checkbox"][data-bank-key]').forEach(cb => {
-      cb.checked = true;
-      selected.add(cb.dataset.bankKey);
-    });
-    updateTotal();
-  });
-
-  els.clearBtn.addEventListener("click", () => {
-    selected.clear();
-    document.querySelectorAll('input[type="checkbox"][data-bank-key]').forEach(cb => {
-      cb.checked = false;
-    });
-    updateTotal();
-  });
-
-  // --- Quiz ---
+  // ===================== QUIZ BUILD =====================
   let quizQuestions = [];
   let current = 0;
-  let locked = false;
   let scoreCorrect = 0;
   let scoreAnswered = 0;
+  let locked = false;
 
-  function buildQuizFromSelectedBanks() {
-    const all = [];
-    selected.forEach((key) => {
-      const q = (banks[key]?.questions || []);
-      all.push(...q);
+  function buildQuiz() {
+    const map = new Map();
+
+    selectedBanks.forEach(key => {
+      banks[key].questions.forEach(q => map.set(q.id, q));
     });
 
-    // Contrôles minimaux (sécurité logique)
-    const clean = all.filter(q =>
-      q &&
-      typeof q.stem === "string" &&
-      Array.isArray(q.choices) &&
-      q.choices.length >= 2 &&
-      Number.isInteger(q.answerIndex) &&
-      q.answerIndex >= 0 &&
-      q.answerIndex < q.choices.length
-    );
+    selectedTags.forEach(tag => {
+      tagIndex.get(tag).forEach(q => map.set(q.id, q));
+    });
 
-    quizQuestions = shuffle(clean);
+    quizQuestions = shuffle(Array.from(map.values()));
   }
 
-  function showHome() {
-    document.querySelector(".card").style.display = ""; // première card (sélection)
-    els.quizCard.style.display = "none";
-  }
-
-  function showQuiz() {
-    document.querySelector(".card").style.display = "none";
-    els.quizCard.style.display = "";
-  }
-
+  // ===================== QUIZ UI =====================
   function renderQuestion() {
     locked = false;
     els.nextBtn.disabled = true;
-    els.feedbackText.textContent = "Clique une réponse pour voir la correction.";
+    els.feedbackText.textContent = "Clique une réponse.";
     els.explainText.textContent = "";
 
     const q = quizQuestions[current];
-    els.progressPill.textContent = `Case ${current + 1} (${current + 1}/${quizQuestions.length})`;
+
+    els.progressPill.textContent = `Case ${current + 1} / ${quizQuestions.length}`;
     els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
     els.questionText.textContent = q.stem;
 
     els.choices.innerHTML = "";
-    q.choices.forEach((choiceText, idx) => {
+
+    q.choices.forEach((choice, idx) => {
       const btn = document.createElement("button");
-      btn.type = "button";
+      btn.textContent = `${String.fromCharCode(65 + idx)}. ${choice}`;
+      btn.style.display = "block";
+      btn.style.margin = "8px 0";
       btn.style.width = "100%";
-      btn.style.textAlign = "left";
-      btn.style.margin = "6px 0";
-      btn.style.padding = "12px 14px";
-      btn.style.borderRadius = "12px";
-      btn.style.border = "1px solid rgba(255,255,255,.1)";
-      btn.style.background = "rgba(0,0,0,.18)";
-      btn.style.cursor = "pointer";
-      btn.textContent = `${String.fromCharCode(65 + idx)}. ${choiceText}`;
 
       btn.addEventListener("click", () => handleAnswer(idx));
       els.choices.appendChild(btn);
     });
   }
 
-  function handleAnswer(selectedIdx) {
+  function handleAnswer(idx) {
     if (locked) return;
     locked = true;
 
     const q = quizQuestions[current];
-    const correctIdx = q.answerIndex;
+    const correct = q.answerIndex;
 
-    const buttons = Array.from(els.choices.querySelectorAll("button"));
+    const buttons = els.choices.querySelectorAll("button");
 
-    // Coloration
-    buttons.forEach((b, idx) => {
+    buttons.forEach((b, i) => {
       b.disabled = true;
-      if (idx === correctIdx) {
-        b.style.borderColor = "rgba(46, 204, 113, .85)";
-        b.style.background = "rgba(46, 204, 113, .16)";
-      }
+      if (i === correct) b.style.background = "rgba(46,204,113,.3)";
     });
 
-    if (selectedIdx !== correctIdx) {
-      const b = buttons[selectedIdx];
-      b.style.borderColor = "rgba(231, 76, 60, .85)";
-      b.style.background = "rgba(231, 76, 60, .16)";
-      els.feedbackText.textContent = "Réponse incorrecte. La bonne réponse est en vert.";
+    if (idx !== correct) {
+      buttons[idx].style.background = "rgba(231,76,60,.3)";
+      els.feedbackText.textContent = "Incorrect.";
     } else {
-      els.feedbackText.textContent = "Réponse correcte.";
+      els.feedbackText.textContent = "Correct.";
     }
 
-    scoreAnswered += 1;
-    if (selectedIdx === correctIdx) scoreCorrect += 1;
-    els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
-
-    if (q.explanation) {
-      els.explainText.textContent = `Explication: ${q.explanation}`;
-    }
+    scoreAnswered++;
+    if (idx === correct) scoreCorrect++;
 
     els.nextBtn.disabled = false;
   }
 
   function nextQuestion() {
     if (current < quizQuestions.length - 1) {
-      current += 1;
+      current++;
       renderQuestion();
     } else {
-      els.progressPill.textContent = "Terminé";
-      els.questionText.textContent = "Fin du quiz.";
+      els.questionText.textContent = "Quiz terminé.";
       els.choices.innerHTML = "";
-      els.feedbackText.textContent = `Score final: ${scoreCorrect} / ${scoreAnswered}.`;
-      els.explainText.textContent = "";
+      els.feedbackText.textContent = `Score final: ${scoreCorrect}/${scoreAnswered}`;
       els.nextBtn.disabled = true;
     }
   }
 
+  // ===================== NAVIGATION =====================
   els.startBtn.addEventListener("click", () => {
-    buildQuizFromSelectedBanks();
+    buildQuiz();
     current = 0;
-    locked = false;
     scoreCorrect = 0;
     scoreAnswered = 0;
-
-    showQuiz();
-
-    if (quizQuestions.length === 0) {
-      els.progressPill.textContent = "Erreur";
-      els.questionText.textContent = "Aucune question valide dans les banques sélectionnées.";
-      els.choices.innerHTML = "";
-      els.feedbackText.textContent = "Vérifie le format des questions (choices/answerIndex).";
-      els.nextBtn.disabled = true;
-      return;
-    }
+    document.querySelector(".card").style.display = "none";
+    els.quizCard.style.display = "block";
     renderQuestion();
   });
 
   els.nextBtn.addEventListener("click", nextQuestion);
+  els.backHomeBtn.addEventListener("click", () => location.reload());
 
-  els.backHomeBtn.addEventListener("click", () => {
-    showHome();
-  });
-
+  // ===================== INIT =====================
   renderBanks();
+  renderTags();
+  updateTotal();
+
 })();
