@@ -12,7 +12,7 @@
     clearBtn: document.getElementById("clearBtn"),
 
     quizCard: document.getElementById("quizCard"),
-    selectionCard: document.getElementById("selectionCard"),
+    selectionCard: document.getElementById("selectionCard"), // Assurez-vous que cet ID existe dans index.html
     questionText: document.getElementById("questionText"),
     choices: document.getElementById("choices"),
     feedbackText: document.getElementById("feedbackText"),
@@ -44,17 +44,31 @@
     return n === 1 ? `${n} ${word}` : `${n} ${word}s`;
   }
 
-  // ===================== TAG INDEX =====================
+  // ===================== TAG INDEX FILTRÉ =====================
   function buildTagIndex() {
     const map = new Map();
+    // Liste des sujets globaux autorisés (en minuscules)
+    const sujetsGlobaux = [
+      "pharmacologie", "urgence", "neurologie", "psychothérapie", 
+      "pédopsychiatrie", "gérontopsychiatrie", "addictologie", 
+      "éthique", "légal", "humeur", "psychose", "anxiété", "sommeil", "périnatalité"
+    ];
+
     for (const key of bankKeys) {
       const qs = banks[key]?.questions || [];
       for (const q of qs) {
         const tags = Array.isArray(q.tags) ? q.tags : [];
         for (let t of tags) {
           t = String(t).toLowerCase().trim();
-          if (!map.has(t)) map.set(t, []);
-          map.get(t).push(q);
+          
+          // Filtre : On ne garde que si c'est une année (4 chiffres) OU un sujet global
+          const estUneAnnee = /^\d{4}$/.test(t);
+          const estUnSujetGlobal = sujetsGlobaux.includes(t);
+
+          if (estUneAnnee || estUnSujetGlobal) {
+            if (!map.has(t)) map.set(t, []);
+            map.get(t).push(q);
+          }
         }
       }
     }
@@ -62,33 +76,33 @@
   }
 
   const tagIndex = buildTagIndex();
-  const allTags = Array.from(tagIndex.keys()).sort();
+  const allTags = Array.from(tagIndex.keys()).sort((a, b) => {
+    // Tri : Années en premier (décroissant), puis alphabétique pour les sujets
+    if (!isNaN(a) && !isNaN(b)) return b - a;
+    if (!isNaN(a)) return -1;
+    if (!isNaN(b)) return 1;
+    return a.localeCompare(b);
+  });
 
   // ===================== UI BANQUES =====================
   function renderBanks() {
     els.banksList.innerHTML = "";
-
     bankKeys.forEach(key => {
       const bank = banks[key];
       const count = bank.questions.length;
-
       const row = document.createElement("label");
       row.className = "bank";
-
       const cb = document.createElement("input");
       cb.type = "checkbox";
       cb.dataset.key = key;
-
       cb.addEventListener("change", () => {
         if (cb.checked) selectedBanks.add(key);
         else selectedBanks.delete(key);
         updateTotal();
       });
-
       const text = document.createElement("div");
       text.innerHTML = `<div style="font-weight:800">${bank.label}</div>
                         <div class="muted">${plural(count, "question")}</div>`;
-
       row.appendChild(cb);
       row.appendChild(text);
       els.banksList.appendChild(row);
@@ -98,28 +112,22 @@
   // ===================== UI TAGS =====================
   function renderTags() {
     els.tagsList.innerHTML = "";
-
     allTags.forEach(tag => {
       const count = tagIndex.get(tag).length;
-
       const row = document.createElement("label");
       row.className = "bank";
-
       const cb = document.createElement("input");
       cb.type = "checkbox";
       cb.dataset.tag = tag;
-
       cb.addEventListener("change", () => {
         if (cb.checked) selectedTags.add(tag);
         else selectedTags.delete(tag);
         updateTotal();
         updateTagTotal();
       });
-
       const text = document.createElement("div");
       text.innerHTML = `<div style="font-weight:800">#${tag}</div>
                         <div class="muted">${plural(count, "question")}</div>`;
-
       row.appendChild(cb);
       row.appendChild(text);
       els.tagsList.appendChild(row);
@@ -137,17 +145,8 @@
   // ===================== TOTAL GÉNÉRAL =====================
   function updateTotal() {
     const finalSet = new Set();
-    
-    // Ajoute les questions des banques
-    selectedBanks.forEach(key => {
-      banks[key].questions.forEach(q => finalSet.add(q.id));
-    });
-
-    // Ajoute les questions des tags
-    selectedTags.forEach(t => {
-      tagIndex.get(t).forEach(q => finalSet.add(q.id));
-    });
-
+    selectedBanks.forEach(key => banks[key].questions.forEach(q => finalSet.add(q.id)));
+    selectedTags.forEach(t => tagIndex.get(t).forEach(q => finalSet.add(q.id)));
     els.totalPill.textContent = `Total sélectionné: ${plural(finalSet.size, "question")}`;
     els.startBtn.disabled = finalSet.size === 0;
   }
@@ -179,15 +178,8 @@
 
   function buildQuiz() {
     const map = new Map();
-
-    selectedBanks.forEach(key => {
-      banks[key].questions.forEach(q => map.set(q.id, q));
-    });
-
-    selectedTags.forEach(tag => {
-      tagIndex.get(tag).forEach(q => map.set(q.id, q));
-    });
-
+    selectedBanks.forEach(key => banks[key].questions.forEach(q => map.set(q.id, q)));
+    selectedTags.forEach(tag => tagIndex.get(tag).forEach(q => map.set(q.id, q)));
     quizQuestions = shuffle(Array.from(map.values()));
   }
 
@@ -197,13 +189,10 @@
     els.nextBtn.disabled = true;
     els.feedbackText.textContent = "Clique une réponse.";
     els.explainText.textContent = "";
-
     const q = quizQuestions[current];
-
     els.progressPill.textContent = `Question ${current + 1} / ${quizQuestions.length}`;
     els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
     els.questionText.textContent = q.stem;
-
     els.choices.innerHTML = "";
 
     q.choices.forEach((choice, idx) => {
@@ -213,7 +202,6 @@
       btn.style.margin = "8px 0";
       btn.style.width = "100%";
       btn.style.textAlign = "left";
-
       btn.addEventListener("click", () => handleAnswer(idx));
       els.choices.appendChild(btn);
     });
@@ -222,16 +210,13 @@
   function handleAnswer(idx) {
     if (locked) return;
     locked = true;
-
     const q = quizQuestions[current];
     const correct = q.answerIndex;
     const buttons = els.choices.querySelectorAll("button");
-
     buttons.forEach((b, i) => {
       b.disabled = true;
       if (i === correct) b.style.background = "rgba(46,204,113,.3)";
     });
-
     if (idx !== correct) {
       buttons[idx].style.background = "rgba(231,76,60,.3)";
       els.feedbackText.textContent = "Incorrect.";
@@ -239,7 +224,6 @@
       els.feedbackText.textContent = "Correct !";
       scoreCorrect++;
     }
-
     scoreAnswered++;
     els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
     els.nextBtn.disabled = false;
@@ -253,7 +237,7 @@
     } else {
       els.questionText.textContent = "Quiz terminé !";
       els.choices.innerHTML = "";
-      els.feedbackText.textContent = `Résultat final : ${scoreCorrect} bonnes réponses sur ${quizQuestions.length}.`;
+      els.feedbackText.textContent = `Résultat : ${scoreCorrect} / ${quizQuestions.length}.`;
       els.nextBtn.disabled = true;
     }
   }
