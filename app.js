@@ -24,25 +24,17 @@ const auth = getAuth(app);
 // --- FONCTION PRINCIPALE ---
 (function () {
   
-  // On cache l'interface tant que Firebase ne nous a pas authentifié
   const selectionCard = document.getElementById("selectionCard");
 
-  // Sécurité Auth : on attend que Firebase confirme la connexion
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("Utilisateur authentifié.");
-      // L'utilisateur est connecté, on affiche l'interface
-      if(selectionCard) {
-          selectionCard.style.opacity = "1";
-      }
+      if(selectionCard) selectionCard.style.opacity = "1";
       initApp();
     } else {
-      // Pas connecté -> Redirection
       window.location.href = 'login.html';
     }
   });
 
-  // Logique de l'application
   async function initApp() {
     
     // --- VARIABLES DOM ---
@@ -53,7 +45,7 @@ const auth = getAuth(app);
       selectAllBtn: document.getElementById("selectAllBtn"),
       clearBtn: document.getElementById("clearBtn"),
       selectionCard: document.getElementById("selectionCard"),
-      examModeToggle: document.getElementById("examModeToggle"), // Toggle Examen
+      examModeToggle: document.getElementById("examModeToggle"),
       
       quizCard: document.getElementById("quizCard"),
       questionText: document.getElementById("questionText"),
@@ -62,7 +54,7 @@ const auth = getAuth(app);
       explainText: document.getElementById("explainText"),
       progressPill: document.getElementById("progressPill"),
       scorePill: document.getElementById("scorePill"),
-      progressBar: document.getElementById("progressBar"), // Barre de progression
+      progressBar: document.getElementById("progressBar"),
       nextBtn: document.getElementById("nextBtn"),
       backHomeBtn: document.getElementById("backHomeBtn"),
 
@@ -84,9 +76,12 @@ const auth = getAuth(app);
     let scoreCorrect = 0;
     let scoreAnswered = 0;
     let locked = false;
-    let isExamMode = false; // Variable pour le mode examen
+    let isExamMode = false;
+    
+    // NOUVEAU : Stockage des erreurs pour la révision
+    let wrongAnswers = []; 
 
-    // --- CHARGEMENT DES CORRECTIONS (Arrière-plan) ---
+    // --- CHARGEMENT CORRECTIONS ---
     try {
       if(db) {
         const snapshot = await getDocs(collection(db, "corrections"));
@@ -98,19 +93,18 @@ const auth = getAuth(app);
             if (q) q.answerIndex = newIndex;
           }
         });
-        console.log("Corrections appliquées.");
       }
-    } catch (e) { console.warn("Corrections non chargées (hors ligne ?)"); }
+    } catch (e) { console.warn("Corrections non chargées"); }
 
     // --- UTILS ---
     function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
     function plural(n, w) { return n === 1 ? `${n} ${w}` : `${n} ${w}s`; }
 
-    // --- INTERFACE DE SÉLECTION ---
+    // --- UI SELECTION ---
     function renderBanks() {
       els.banksList.innerHTML = "";
       if(bankKeys.length === 0) {
-          els.banksList.innerHTML = "<div style='padding:20px; color:#e74c3c'>Aucune banque chargée. Vérifiez index.html</div>";
+          els.banksList.innerHTML = "<div style='padding:20px; color:#e74c3c'>Aucune banque chargée.</div>";
           return;
       }
 
@@ -148,14 +142,15 @@ const auth = getAuth(app);
     els.selectAllBtn.onclick = () => { els.banksList.querySelectorAll("input").forEach(cb=>{cb.checked=true; selectedBanks.add(cb.dataset.key)}); updateTotal(); };
     els.clearBtn.onclick = () => { els.banksList.querySelectorAll("input").forEach(cb=>cb.checked=false); selectedBanks.clear(); updateTotal(); };
 
-    // --- LOGIQUE DU QUIZ ---
+    // --- LOGIQUE QUIZ ---
     els.startBtn.addEventListener("click", () => {
-      // 1. Configuration
-      isExamMode = els.examModeToggle.checked; // On regarde l'état de l'interrupteur
+      isExamMode = els.examModeToggle.checked;
       buildQuiz();
-      current = 0; scoreCorrect = 0; scoreAnswered = 0;
       
-      // 2. Générer la barre de progression (segments vides)
+      current = 0; scoreCorrect = 0; scoreAnswered = 0;
+      wrongAnswers = []; // Reset des erreurs
+      
+      // Barre de progression
       els.progressBar.innerHTML = "";
       quizQuestions.forEach((_, idx) => {
         const seg = document.createElement("div");
@@ -164,7 +159,6 @@ const auth = getAuth(app);
         els.progressBar.appendChild(seg);
       });
 
-      // 3. Affichage
       els.selectionCard.style.display = "none";
       els.quizCard.style.display = "block";
       renderQuestion();
@@ -191,11 +185,7 @@ const auth = getAuth(app);
 
       const q = quizQuestions[current];
       els.progressPill.textContent = `Question ${current + 1} / ${quizQuestions.length}`;
-      
-      // En mode examen, on cache le score actuel
-      if(isExamMode) els.scorePill.textContent = "Score masqué";
-      else els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
-
+      els.scorePill.textContent = isExamMode ? "Score masqué" : `Score: ${scoreCorrect} / ${scoreAnswered}`;
       els.questionText.textContent = q.stem;
       if(els.reportContext) els.reportContext.textContent = `ID: ${q.id}`;
 
@@ -208,7 +198,6 @@ const auth = getAuth(app);
         els.choices.appendChild(btn);
       });
 
-      // Mettre le segment de la barre en surbrillance (bleu)
       const curSeg = document.getElementById(`seg-${current}`);
       if(curSeg) curSeg.classList.add("active");
     }
@@ -220,62 +209,60 @@ const auth = getAuth(app);
       const q = quizQuestions[current];
       const correct = q.answerIndex;
       const buttons = els.choices.querySelectorAll("button");
-      
-      // On retire le focus "actif" du segment de la barre
       const curSeg = document.getElementById(`seg-${current}`);
       if(curSeg) curSeg.classList.remove("active");
 
-      // Gestion de l'affichage des boutons
       buttons.forEach((b, i) => {
         b.disabled = true;
         
         if (isExamMode) {
-            // --- MODE EXAMEN : On ne montre pas la réponse ---
+            // Mode Examen : Simple surbrillance bleue du choix
             if (i === idx) {
-                // Juste indiquer ce qu'on a cliqué (Bleu)
-                b.style.background = "#3498db"; 
-                b.style.borderColor = "#3498db";
-                b.style.color = "#fff";
-                b.style.opacity = "1";
+                b.style.background = "#3498db"; b.style.borderColor = "#3498db";
+                b.style.color = "#fff"; b.style.opacity = "1";
             } else {
                 b.style.opacity = "0.5";
             }
         } else {
-            // --- MODE ÉTUDE : Vert / Rouge ---
+            // Mode Étude
             if (i === correct) {
-                b.style.background = "#2ecc71";
-                b.style.borderColor = "#2ecc71";
-                b.style.color = "#fff"; b.style.fontWeight = "bold"; b.style.opacity = "1";
+                b.style.background = "#2ecc71"; b.style.borderColor = "#2ecc71";
+                b.style.color = "#fff"; b.style.fontWeight="bold"; b.style.opacity="1";
             } else if (i === idx) {
-                b.style.background = "#e74c3c";
-                b.style.borderColor = "#e74c3c";
-                b.style.color = "#fff"; b.style.opacity = "1";
+                b.style.background = "#e74c3c"; b.style.borderColor = "#e74c3c";
+                b.style.color = "#fff"; b.style.opacity="1";
             } else {
                 b.style.opacity = "0.4";
             }
         }
       });
 
-      // Calcul des points
-      if (idx === correct) scoreCorrect++;
+      if (idx === correct) {
+          scoreCorrect++;
+      } else {
+          // Si c'est faux, on enregistre l'erreur pour plus tard
+          wrongAnswers.push({
+              question: q,
+              userChoice: idx,
+              correctChoice: correct
+          });
+      }
+      
       scoreAnswered++;
 
-      // Feedback Textuel et Barre de progression
       if (isExamMode) {
-          // Mode Examen
           els.feedbackText.textContent = "Réponse enregistrée.";
-          els.feedbackText.style.color = "#a0aec0"; // Gris
-          if(curSeg) curSeg.classList.add("answered"); // Gris
+          els.feedbackText.style.color = "#a0aec0";
+          if(curSeg) curSeg.classList.add("answered");
       } else {
-          // Mode Étude
           if(idx !== correct) {
               els.feedbackText.textContent = "Incorrect.";
               els.feedbackText.style.color = "#e74c3c";
-              if(curSeg) curSeg.classList.add("wrong"); // Rouge
+              if(curSeg) curSeg.classList.add("wrong");
           } else {
               els.feedbackText.textContent = "Correct !";
               els.feedbackText.style.color = "#2ecc71";
-              if(curSeg) curSeg.classList.add("correct"); // Vert
+              if(curSeg) curSeg.classList.add("correct");
           }
           els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
           if (q.explain) els.explainText.textContent = q.explain;
@@ -283,7 +270,7 @@ const auth = getAuth(app);
 
       els.nextBtn.disabled = false;
 
-      // Envoi des statistiques (Anonyme)
+      // Stats
       if (db && q.id) {
           const statsRef = doc(db, "stats", q.id);
           const u = { total: increment(1) }; u[idx] = increment(1);
@@ -296,9 +283,12 @@ const auth = getAuth(app);
         current++;
         renderQuestion();
       } else {
-        // Fin du quiz
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
         els.questionText.textContent = isExamMode ? "Examen terminé !" : "Quiz terminé !";
-        els.choices.innerHTML = "";
         
         let msg = `Résultat final : ${scoreCorrect} / ${quizQuestions.length}`;
         if(isExamMode) msg += ` (${Math.round(scoreCorrect/quizQuestions.length*100)}%)`;
@@ -308,7 +298,73 @@ const auth = getAuth(app);
         els.scorePill.textContent = `Fin: ${scoreCorrect} / ${quizQuestions.length}`;
         els.nextBtn.disabled = true;
         if(els.openReportBtn) els.openReportBtn.style.display = "none";
-      }
+        
+        // --- AFFICHAGE DE LA RÉVISION (SI MODE EXAMEN) ---
+        if (isExamMode && wrongAnswers.length > 0) {
+            els.choices.innerHTML = ""; // On vide les boutons
+            
+            // Bouton pour lancer la révision
+            const reviewBtn = document.createElement("button");
+            reviewBtn.textContent = `🔍 Voir mes ${wrongAnswers.length} erreurs`;
+            reviewBtn.style.background = "var(--warning)";
+            reviewBtn.style.color = "#000";
+            reviewBtn.style.border = "none";
+            reviewBtn.style.marginTop = "20px";
+            
+            reviewBtn.onclick = () => showExamReview();
+            
+            els.choices.appendChild(reviewBtn);
+        } else if (isExamMode && wrongAnswers.length === 0) {
+            els.choices.innerHTML = "<div style='text-align:center; padding:20px; font-size:1.2em; color:#2ecc71;'>🎉 Bravo ! 100% de bonnes réponses !</div>";
+        } else {
+             els.choices.innerHTML = ""; // Mode normal
+        }
+    }
+
+    // --- FONCTION D'AFFICHAGE DES ERREURS ---
+    function showExamReview() {
+        els.questionText.textContent = "Révision des erreurs";
+        els.feedbackText.textContent = "";
+        els.choices.innerHTML = "";
+        
+        wrongAnswers.forEach((item, index) => {
+            const q = item.question;
+            const card = document.createElement("div");
+            card.className = "review-item";
+            
+            let html = `<div class="review-stem">${index + 1}. ${q.stem}</div>`;
+            
+            q.choices.forEach((choice, idx) => {
+                let className = "review-choice";
+                let icon = "";
+                
+                // Si c'est ce que l'utilisateur a choisi (FAUX)
+                if (idx === item.userChoice) {
+                    className += " user-wrong";
+                    icon = " ❌ (Votre réponse)";
+                }
+                // Si c'est la bonne réponse
+                else if (idx === item.correctChoice) {
+                    className += " correct-answer";
+                    icon = " ✅ (Bonne réponse)";
+                }
+                
+                html += `<div class="${className}">${String.fromCharCode(65 + idx)}. ${choice} ${icon}</div>`;
+            });
+            
+            if (q.explain) {
+                html += `<div class="review-explain">ℹ️ ${q.explain}</div>`;
+            }
+            
+            card.innerHTML = html;
+            els.choices.appendChild(card);
+        });
+        
+        // Bouton pour quitter en bas de page
+        const closeBtn = document.createElement("button");
+        closeBtn.textContent = "Fermer la révision";
+        closeBtn.onclick = () => location.reload();
+        els.choices.appendChild(closeBtn);
     }
 
     // --- LISTENERS ---
