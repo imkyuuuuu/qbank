@@ -21,15 +21,63 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// --- LISTE SÉCURISÉE DES BANQUES ---
+const SECRET_FOLDER = "assets_x92m_secure_v4"; 
+const BANK_FILES = [
+  "bank-2021.js", "bank-2022.js", "bank-2023.js", "bank-2024.js", 
+  "bank-2025.js", "bank-CL.js", "bank-TP.js", "bank-TUS.js", 
+  "bank-alimentaire.js", "bank-anxiete.js", "bank-cope.js", 
+  "bank-depression.js", "bank-epidemio.js", "bank-geronto.js", 
+  "bank-legal.js", "bank-mab.js", "bank-pedopsy.js", 
+  "bank-perinat.js", "bank-pharmatothx.js", "bank-psychose.js", 
+  "bank-psychotherapie.js", "bank-sommeil.js", "bank-usa6.js", 
+  "bank-usa5.js", "bank-cope-2025.js"
+];
+
+function loadScript(fileName) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `./${SECRET_FOLDER}/${fileName}`;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+// --- INJECTION CSS POUR LA RÉVISION (Pour garantir l'affichage) ---
+const reviewStyle = document.createElement('style');
+reviewStyle.innerHTML = `
+  .review-item { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: left; }
+  .review-stem { font-weight: 700; margin-bottom: 12px; color: #e9ecf5; font-size: 1.1em; }
+  .review-choice { padding: 10px 12px; margin: 4px 0; border-radius: 6px; font-size: 14px; opacity: 0.7; border: 1px solid transparent; }
+  .review-choice.user-wrong { background: rgba(231, 76, 60, 0.2); border-color: #e74c3c; color: #ffadad; opacity: 1; font-weight: bold; }
+  .review-choice.correct-answer { background: rgba(46, 204, 113, 0.2); border-color: #2ecc71; color: #acfcd1; opacity: 1; font-weight: bold; }
+  .review-explain { margin-top: 12px; font-style: italic; font-size: 13px; color: #4dabf7; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
+`;
+document.head.appendChild(reviewStyle);
+
+
 // --- FONCTION PRINCIPALE ---
 (function () {
   
   const selectionCard = document.getElementById("selectionCard");
 
+  // Auth Listener
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      if(selectionCard) selectionCard.style.opacity = "1";
-      initApp();
+      console.log("Connecté.");
+      try {
+        // Chargement des scripts
+        await Promise.all(BANK_FILES.map(file => loadScript(file)));
+        if(selectionCard) {
+            selectionCard.style.transition = "opacity 0.5s";
+            selectionCard.style.opacity = "1";
+        }
+        initApp();
+      } catch (err) {
+        console.error(err);
+        alert("Erreur de chargement des questions.");
+      }
     } else {
       window.location.href = 'login.html';
     }
@@ -66,7 +114,6 @@ const auth = getAuth(app);
       reportContext: document.getElementById("reportContext")
     };
 
-    // --- DONNÉES ---
     const banks = window.QUIZ_BANKS || {};
     const bankKeys = Object.keys(banks);
     const selectedBanks = new Set();
@@ -77,9 +124,7 @@ const auth = getAuth(app);
     let scoreAnswered = 0;
     let locked = false;
     let isExamMode = false;
-    
-    // NOUVEAU : Stockage des erreurs pour la révision
-    let wrongAnswers = []; 
+    let wrongAnswers = []; // Stockage des erreurs
 
     // --- CHARGEMENT CORRECTIONS ---
     try {
@@ -94,7 +139,7 @@ const auth = getAuth(app);
           }
         });
       }
-    } catch (e) { console.warn("Corrections non chargées"); }
+    } catch (e) {}
 
     // --- UTILS ---
     function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
@@ -103,11 +148,6 @@ const auth = getAuth(app);
     // --- UI SELECTION ---
     function renderBanks() {
       els.banksList.innerHTML = "";
-      if(bankKeys.length === 0) {
-          els.banksList.innerHTML = "<div style='padding:20px; color:#e74c3c'>Aucune banque chargée.</div>";
-          return;
-      }
-
       bankKeys.forEach(key => {
         const bank = banks[key];
         const count = bank.questions.length;
@@ -124,8 +164,7 @@ const auth = getAuth(app);
         });
 
         const text = document.createElement("div");
-        text.innerHTML = `<div style="font-weight:800">${bank.label}</div>
-                          <div class="muted">${plural(count, "question")}</div>`;
+        text.innerHTML = `<div style="font-weight:800">${bank.label}</div><div class="muted">${plural(count, "question")}</div>`;
         row.appendChild(cb);
         row.appendChild(text);
         els.banksList.appendChild(row);
@@ -135,7 +174,7 @@ const auth = getAuth(app);
     function updateTotal() {
       let total = 0;
       selectedBanks.forEach(k => total += banks[k].questions.length);
-      els.totalPill.textContent = `Total sélectionné: ${total}`;
+      els.totalPill.textContent = `Total: ${total}`;
       els.startBtn.disabled = total === 0;
     }
 
@@ -148,7 +187,7 @@ const auth = getAuth(app);
       buildQuiz();
       
       current = 0; scoreCorrect = 0; scoreAnswered = 0;
-      wrongAnswers = []; // Reset des erreurs
+      wrongAnswers = []; // Reset important
       
       // Barre de progression
       els.progressBar.innerHTML = "";
@@ -176,11 +215,11 @@ const auth = getAuth(app);
       els.feedbackText.textContent = isExamMode ? "Mode Examen" : "Choisissez une réponse.";
       els.feedbackText.style.color = "var(--primary-blue)";
       els.explainText.textContent = "";
-
+      
       if(els.openReportBtn) {
           els.openReportBtn.style.display = "inline-block";
-          els.openReportBtn.disabled = false;
           els.openReportBtn.innerHTML = "🚩 Signaler";
+          els.openReportBtn.disabled = false;
       }
 
       const q = quizQuestions[current];
@@ -214,40 +253,32 @@ const auth = getAuth(app);
 
       buttons.forEach((b, i) => {
         b.disabled = true;
-        
         if (isExamMode) {
-            // Mode Examen : Simple surbrillance bleue du choix
+            // Mode Examen : Bleu seulement
             if (i === idx) {
-                b.style.background = "#3498db"; b.style.borderColor = "#3498db";
-                b.style.color = "#fff"; b.style.opacity = "1";
-            } else {
-                b.style.opacity = "0.5";
-            }
+                b.style.background = "#3498db"; b.style.borderColor = "#3498db"; b.style.color = "#fff"; b.style.opacity = "1";
+            } else { b.style.opacity = "0.5"; }
         } else {
-            // Mode Étude
+            // Mode Étude : Vert/Rouge
             if (i === correct) {
-                b.style.background = "#2ecc71"; b.style.borderColor = "#2ecc71";
-                b.style.color = "#fff"; b.style.fontWeight="bold"; b.style.opacity="1";
+                b.style.background = "#2ecc71"; b.style.borderColor = "#2ecc71"; b.style.color = "#fff"; b.style.fontWeight="bold"; b.style.opacity="1";
             } else if (i === idx) {
-                b.style.background = "#e74c3c"; b.style.borderColor = "#e74c3c";
-                b.style.color = "#fff"; b.style.opacity="1";
-            } else {
-                b.style.opacity = "0.4";
-            }
+                b.style.background = "#e74c3c"; b.style.borderColor = "#e74c3c"; b.style.color = "#fff"; b.style.opacity="1";
+            } else { b.style.opacity = "0.4"; }
         }
       });
 
+      // Logique de points
       if (idx === correct) {
           scoreCorrect++;
       } else {
-          // Si c'est faux, on enregistre l'erreur pour plus tard
+          // Si c'est faux, on ajoute aux erreurs
           wrongAnswers.push({
               question: q,
               userChoice: idx,
               correctChoice: correct
           });
       }
-      
       scoreAnswered++;
 
       if (isExamMode) {
@@ -270,7 +301,7 @@ const auth = getAuth(app);
 
       els.nextBtn.disabled = false;
 
-      // Stats
+      // Stats Firebase
       if (db && q.id) {
           const statsRef = doc(db, "stats", q.id);
           const u = { total: increment(1) }; u[idx] = increment(1);
@@ -297,36 +328,54 @@ const auth = getAuth(app);
         els.feedbackText.style.color = "var(--primary-blue)";
         els.scorePill.textContent = `Fin: ${scoreCorrect} / ${quizQuestions.length}`;
         els.nextBtn.disabled = true;
+        
+        // Cacher bouton signaler à la fin
         if(els.openReportBtn) els.openReportBtn.style.display = "none";
         
-        // --- AFFICHAGE DE LA RÉVISION (SI MODE EXAMEN) ---
-        if (isExamMode && wrongAnswers.length > 0) {
-            els.choices.innerHTML = ""; // On vide les boutons
-            
-            // Bouton pour lancer la révision
-            const reviewBtn = document.createElement("button");
-            reviewBtn.textContent = `🔍 Voir mes ${wrongAnswers.length} erreurs`;
-            reviewBtn.style.background = "var(--warning)";
-            reviewBtn.style.color = "#000";
-            reviewBtn.style.border = "none";
-            reviewBtn.style.marginTop = "20px";
-            
-            reviewBtn.onclick = () => showExamReview();
-            
-            els.choices.appendChild(reviewBtn);
-        } else if (isExamMode && wrongAnswers.length === 0) {
-            els.choices.innerHTML = "<div style='text-align:center; padding:20px; font-size:1.2em; color:#2ecc71;'>🎉 Bravo ! 100% de bonnes réponses !</div>";
-        } else {
-             els.choices.innerHTML = ""; // Mode normal
+        // --- LOGIQUE D'AFFICHAGE DU BOUTON ERREURS ---
+        els.choices.innerHTML = ""; // On nettoie la zone des boutons
+
+        if (isExamMode) {
+            if (wrongAnswers.length > 0) {
+                // Création du bouton Révision
+                const btn = document.createElement("button");
+                btn.textContent = `🔍 Voir mes ${wrongAnswers.length} erreurs`;
+                btn.style.background = "#f1c40f"; // Jaune
+                btn.style.color = "#000";
+                btn.style.border = "none";
+                btn.style.padding = "15px";
+                btn.style.fontSize = "18px";
+                btn.style.marginTop = "20px";
+                btn.style.cursor = "pointer";
+                
+                // Au clic, on lance la fonction d'affichage
+                btn.onclick = () => showExamReview();
+                
+                els.choices.appendChild(btn);
+            } else {
+                els.choices.innerHTML = "<div style='text-align:center; color:#2ecc71; font-size:1.2em; padding:20px;'>🎉 Score parfait ! Aucune erreur.</div>";
+            }
         }
+        
+        // Bouton retour accueil (toujours utile)
+        const homeBtn = document.createElement("button");
+        homeBtn.textContent = "Retour à l'accueil";
+        homeBtn.style.marginTop = "10px";
+        homeBtn.style.background = "transparent";
+        homeBtn.style.border = "1px solid var(--border-color)";
+        homeBtn.style.color = "var(--text-muted)";
+        homeBtn.onclick = () => location.reload();
+        els.choices.appendChild(homeBtn);
     }
 
-    // --- FONCTION D'AFFICHAGE DES ERREURS ---
+    // --- FONCTION D'AFFICHAGE DE LA LISTE D'ERREURS ---
     function showExamReview() {
+        // On change le titre
         els.questionText.textContent = "Révision des erreurs";
         els.feedbackText.textContent = "";
-        els.choices.innerHTML = "";
+        els.choices.innerHTML = ""; // On vide tout
         
+        // On génère la liste
         wrongAnswers.forEach((item, index) => {
             const q = item.question;
             const card = document.createElement("div");
@@ -336,20 +385,17 @@ const auth = getAuth(app);
             
             q.choices.forEach((choice, idx) => {
                 let className = "review-choice";
-                let icon = "";
+                let suffix = "";
                 
-                // Si c'est ce que l'utilisateur a choisi (FAUX)
                 if (idx === item.userChoice) {
                     className += " user-wrong";
-                    icon = " ❌ (Votre réponse)";
-                }
-                // Si c'est la bonne réponse
-                else if (idx === item.correctChoice) {
+                    suffix = " ❌ (Votre choix)";
+                } else if (idx === item.correctChoice) {
                     className += " correct-answer";
-                    icon = " ✅ (Bonne réponse)";
+                    suffix = " ✅ (Bonne réponse)";
                 }
                 
-                html += `<div class="${className}">${String.fromCharCode(65 + idx)}. ${choice} ${icon}</div>`;
+                html += `<div class="${className}">${String.fromCharCode(65 + idx)}. ${choice} ${suffix}</div>`;
             });
             
             if (q.explain) {
@@ -359,10 +405,11 @@ const auth = getAuth(app);
             card.innerHTML = html;
             els.choices.appendChild(card);
         });
-        
-        // Bouton pour quitter en bas de page
+
+        // Bouton pour fermer en bas
         const closeBtn = document.createElement("button");
-        closeBtn.textContent = "Fermer la révision";
+        closeBtn.textContent = "Fermer et Retourner à l'accueil";
+        closeBtn.style.marginTop = "20px";
         closeBtn.onclick = () => location.reload();
         els.choices.appendChild(closeBtn);
     }
