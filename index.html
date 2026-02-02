@@ -24,6 +24,7 @@
       --border-color: rgba(255, 255, 255, 0.1);
       --success: #2ecc71;
       --error: #e74c3c;
+      --warning: #f1c40f;
     }
 
     body {
@@ -39,7 +40,7 @@
 
     .wrap { width: min(900px, 100%); position: relative; }
 
-    /* Cartes Principales */
+    /* Cartes */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -49,7 +50,6 @@
       margin-bottom: 20px;
     }
 
-    /* En-têtes */
     h1 {
       margin: 0 0 16px 0;
       font-size: 20px;
@@ -78,14 +78,10 @@
       transition: all 0.2s ease;
     }
 
-    .bank:hover {
-      background: var(--accent-blue);
-      border-color: var(--primary-blue);
-    }
-
+    .bank:hover { background: var(--accent-blue); border-color: var(--primary-blue); }
     .muted { color: var(--text-muted); font-size: 13px; }
 
-    /* Boutons Généraux */
+    /* Boutons */
     button {
       border: 1px solid var(--primary-blue);
       background: var(--primary-blue);
@@ -103,78 +99,87 @@
 
     #clearBtn { background: transparent; color: var(--text-main); border-color: var(--border-color); }
     #selectAllBtn { background: var(--accent-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
-    
-    /* Bouton Déconnexion */
-    #logoutBtn {
-        font-size: 12px; padding: 6px 12px; background: transparent; border: 1px solid var(--error); color: var(--error);
-    }
+    #logoutBtn { font-size: 12px; padding: 6px 12px; background: transparent; border: 1px solid var(--error); color: var(--error); }
 
     .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
 
     .pill {
-      border-radius: 8px;
-      padding: 6px 12px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      color: var(--primary-blue);
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: 8px; padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color);
+      color: var(--primary-blue); font-size: 13px; font-weight: 600;
     }
 
-    /* Style du Quiz */
-    #questionText {
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 1.4;
-      margin: 24px 0;
+    /* --- BARRE DE PROGRESSION VISUELLE --- */
+    .progress-track {
+      display: flex; height: 8px; width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px; overflow: hidden;
+      margin: 15px 0 25px 0;
     }
+    .progress-segment {
+      flex-grow: 1; margin-right: 2px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: background 0.3s ease;
+    }
+    .progress-segment:last-child { margin-right: 0; }
+    
+    /* Couleurs Progression */
+    .progress-segment.correct { background: var(--success); } /* Vert */
+    .progress-segment.wrong { background: var(--error); }     /* Rouge */
+    .progress-segment.answered { background: var(--text-muted); } /* Gris (Examen) */
+    .progress-segment.active { background: var(--primary-blue); box-shadow: 0 0 10px var(--primary-blue); }
+
+    /* --- SWITCH MODE EXAMEN --- */
+    .toggle-container {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);
+    }
+    .switch {
+      position: relative; display: inline-block; width: 40px; height: 20px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc; transition: .4s; border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+      background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--warning); }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .toggle-label { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .toggle-desc { font-size: 11px; color: var(--text-muted); }
+
+    /* --- Quiz UI --- */
+    #questionText { font-size: 22px; font-weight: 700; line-height: 1.4; margin: 24px 0; }
 
     #choices button {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      text-align: left;
-      font-weight: 400;
-      margin-bottom: 8px;
-      display: block;
-      width: 100%;
-      padding: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.05); color: var(--text-main);
+      border: 1px solid var(--border-color); text-align: left; font-weight: 400;
+      margin-bottom: 8px; display: block; width: 100%; padding: 16px;
+      border-radius: 8px; cursor: pointer; font-size: 16px; transition: all 0.2s;
     }
+    #choices button:hover:not(:disabled) { background: var(--accent-blue); border-color: var(--primary-blue); }
 
-    #choices button:hover:not(:disabled) {
-      background: var(--accent-blue);
-      border-color: var(--primary-blue);
-    }
-
-    /* --- Style du Modal de Signalement --- */
+    /* Modal Signalement */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: none; justify-content: center; align-items: center; z-index: 1000;
+      background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 1000;
       backdrop-filter: blur(5px);
     }
-
     .modal-card {
       background: var(--card-bg); border: 1px solid var(--border-color);
       padding: 24px; border-radius: 16px; width: 90%; max-width: 400px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-
-    .modal-card h2 { margin-top: 0; color: var(--primary-blue); font-size: 18px; }
-
     textarea {
       width: 100%; height: 100px; background: rgba(255,255,255,0.05);
       border: 1px solid var(--border-color); border-radius: 8px;
       color: var(--text-main); padding: 10px; margin: 15px 0;
       font-family: inherit; resize: vertical; box-sizing: border-box;
     }
-
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-
     .btn-cancel { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
     .btn-submit { background: var(--error); border: 1px solid var(--error); color: white; }
 
@@ -184,9 +189,9 @@
   
   <div id="reportModal" class="modal-overlay">
     <div class="modal-card">
-      <h2>Signaler une erreur</h2>
+      <h2 style="margin-top:0; color:var(--primary-blue)">Signaler une erreur</h2>
       <p class="muted" id="reportContext">Question ID: ...</p>
-      <textarea id="reportReason" placeholder="Décrivez l'erreur (ex: La réponse B est fausse car...)" required></textarea>
+      <textarea id="reportReason" placeholder="Décrivez l'erreur..." required></textarea>
       <div class="modal-actions">
         <button id="cancelReportBtn" class="btn-cancel">Annuler</button>
         <button id="submitReportBtn" class="btn-submit">Envoyer</button>
@@ -196,7 +201,7 @@
 
   <main class="wrap">
     
-    <section class="card" id="selectionCard">
+    <section class="card" id="selectionCard" style="opacity:0; transition:opacity 0.5s;">
       <h1>
         Sources d'études
         <button id="logoutBtn" onclick="sessionStorage.removeItem('auth_token'); location.reload();">Déconnexion</button>
@@ -204,7 +209,17 @@
       
       <div class="row">
         <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
-        <div class="pill muted">Cochez les banques</div>
+        
+        <label class="toggle-container">
+          <label class="switch">
+            <input type="checkbox" id="examModeToggle">
+            <span class="slider"></span>
+          </label>
+          <div>
+            <div class="toggle-label">Mode Examen</div>
+            <div class="toggle-desc">Pas de feedback immédiat</div>
+          </div>
+        </label>
       </div>
 
       <div class="banks" id="banksList">
@@ -224,6 +239,8 @@
         <div class="pill" id="progressPill">Question 1</div>
         <div class="pill" id="scorePill">Score: 0 / 0</div>
       </div>
+      
+      <div id="progressBar" class="progress-track"></div>
       
       <p id="questionText">—</p>
       
@@ -270,7 +287,9 @@
     <script src="./banks/bank-sommeil.js"></script>
     <script src="./banks/bank-usa6.js"></script>
     <script src="./banks/bank-usa5.js"></script>
-    <script src="./banks/bank-cope2025.js"></script> <script type="module" src="./app.js"></script>
+    <script src="./banks/bank-cope2025.js"></script>
+
+    <script type="module" src="./app.js"></script>
   </main>
 </body>
 </html>
