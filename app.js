@@ -4,6 +4,7 @@ import {
   getFirestore, collection, addDoc, getDocs, serverTimestamp, 
   doc, setDoc, increment 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURATION FIREBASE ---
 const firebaseConfig = {
@@ -16,337 +17,325 @@ const firebaseConfig = {
   measurementId: "G-KBMXFQ96HH"
 };
 
-// Initialisation de Firebase
-let db;
-try {
-  const app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  console.log("Firebase initialisé.");
-} catch (e) {
-  console.error("Erreur init Firebase:", e);
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 // --- FONCTION PRINCIPALE ---
 (function () {
   
-  // 1. RÉFÉRENCES DOM
-  const els = {
-    // Sélection
-    banksList: document.getElementById("banksList"),
-    totalPill: document.getElementById("totalPill"),
-    startBtn: document.getElementById("startBtn"),
-    selectAllBtn: document.getElementById("selectAllBtn"),
-    clearBtn: document.getElementById("clearBtn"),
-    selectionCard: document.getElementById("selectionCard"),
+  // On cache l'interface tant que Firebase ne nous a pas authentifié
+  const selectionCard = document.getElementById("selectionCard");
+
+  // Sécurité Auth : on attend que Firebase confirme la connexion
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("Utilisateur authentifié.");
+      // L'utilisateur est connecté, on affiche l'interface
+      if(selectionCard) {
+          selectionCard.style.opacity = "1";
+      }
+      initApp();
+    } else {
+      // Pas connecté -> Redirection
+      window.location.href = 'login.html';
+    }
+  });
+
+  // Logique de l'application
+  async function initApp() {
     
-    // Quiz
-    quizCard: document.getElementById("quizCard"),
-    questionText: document.getElementById("questionText"),
-    choices: document.getElementById("choices"),
-    feedbackText: document.getElementById("feedbackText"),
-    explainText: document.getElementById("explainText"),
-    progressPill: document.getElementById("progressPill"),
-    scorePill: document.getElementById("scorePill"),
-    nextBtn: document.getElementById("nextBtn"),
-    backHomeBtn: document.getElementById("backHomeBtn"),
+    // --- VARIABLES DOM ---
+    const els = {
+      banksList: document.getElementById("banksList"),
+      totalPill: document.getElementById("totalPill"),
+      startBtn: document.getElementById("startBtn"),
+      selectAllBtn: document.getElementById("selectAllBtn"),
+      clearBtn: document.getElementById("clearBtn"),
+      selectionCard: document.getElementById("selectionCard"),
+      examModeToggle: document.getElementById("examModeToggle"), // Toggle Examen
+      
+      quizCard: document.getElementById("quizCard"),
+      questionText: document.getElementById("questionText"),
+      choices: document.getElementById("choices"),
+      feedbackText: document.getElementById("feedbackText"),
+      explainText: document.getElementById("explainText"),
+      progressPill: document.getElementById("progressPill"),
+      scorePill: document.getElementById("scorePill"),
+      progressBar: document.getElementById("progressBar"), // Barre de progression
+      nextBtn: document.getElementById("nextBtn"),
+      backHomeBtn: document.getElementById("backHomeBtn"),
 
-    // Signalement
-    openReportBtn: document.getElementById("openReportBtn"),
-    reportModal: document.getElementById("reportModal"),
-    cancelReportBtn: document.getElementById("cancelReportBtn"),
-    submitReportBtn: document.getElementById("submitReportBtn"),
-    reportReason: document.getElementById("reportReason"),
-    reportContext: document.getElementById("reportContext")
-  };
+      openReportBtn: document.getElementById("openReportBtn"),
+      reportModal: document.getElementById("reportModal"),
+      cancelReportBtn: document.getElementById("cancelReportBtn"),
+      submitReportBtn: document.getElementById("submitReportBtn"),
+      reportReason: document.getElementById("reportReason"),
+      reportContext: document.getElementById("reportContext")
+    };
 
-  // 2. DONNÉES
-  const banks = window.QUIZ_BANKS || {};
-  const bankKeys = Object.keys(banks);
-  const selectedBanks = new Set();
-  
-  let quizQuestions = [];
-  let current = 0;
-  let scoreCorrect = 0;
-  let scoreAnswered = 0;
-  let locked = false;
+    // --- DONNÉES ---
+    const banks = window.QUIZ_BANKS || {};
+    const bankKeys = Object.keys(banks);
+    const selectedBanks = new Set();
+    
+    let quizQuestions = [];
+    let current = 0;
+    let scoreCorrect = 0;
+    let scoreAnswered = 0;
+    let locked = false;
+    let isExamMode = false; // Variable pour le mode examen
 
-  // ===================== CHARGEMENT CORRECTIONS (Arrière-plan) =====================
-  async function loadCorrectionsBackground() {
-    if (!db) return;
+    // --- CHARGEMENT DES CORRECTIONS (Arrière-plan) ---
     try {
-      const snapshot = await getDocs(collection(db, "corrections"));
-      if (!snapshot.empty) {
-        let count = 0;
+      if(db) {
+        const snapshot = await getDocs(collection(db, "corrections"));
         snapshot.forEach(doc => {
           const qId = doc.id;
           const newIndex = doc.data().answerIndex;
           for (const key in banks) {
-            const question = banks[key].questions.find(q => q.id === qId);
-            if (question) {
-              question.answerIndex = newIndex;
-              count++;
-            }
+            const q = banks[key].questions.find(q => q.id === qId);
+            if (q) q.answerIndex = newIndex;
           }
         });
-        console.log(`${count} corrections chargées.`);
+        console.log("Corrections appliquées.");
       }
-    } catch (e) {
-      console.warn("Mode hors ligne : corrections non chargées.");
-    }
-  }
+    } catch (e) { console.warn("Corrections non chargées (hors ligne ?)"); }
 
-  // ===================== UTILITAIRES =====================
-  function shuffle(array) {
-    const a = array.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
+    // --- UTILS ---
+    function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
+    function plural(n, w) { return n === 1 ? `${n} ${w}` : `${n} ${w}s`; }
 
-  function plural(n, word) {
-    return n === 1 ? `${n} ${word}` : `${n} ${word}s`;
-  }
+    // --- INTERFACE DE SÉLECTION ---
+    function renderBanks() {
+      els.banksList.innerHTML = "";
+      if(bankKeys.length === 0) {
+          els.banksList.innerHTML = "<div style='padding:20px; color:#e74c3c'>Aucune banque chargée. Vérifiez index.html</div>";
+          return;
+      }
 
-  // ===================== INTERFACE DE SÉLECTION =====================
-  function renderBanks() {
-    els.banksList.innerHTML = "";
-    
-    if (bankKeys.length === 0) {
-      els.banksList.innerHTML = "<div style='color:#e74c3c; padding:20px;'>Aucune banque trouvée.</div>";
-      return;
-    }
+      bankKeys.forEach(key => {
+        const bank = banks[key];
+        const count = bank.questions.length;
+        const row = document.createElement("label");
+        row.className = "bank";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.dataset.key = key;
 
-    bankKeys.forEach(key => {
-      const bank = banks[key];
-      const count = bank.questions.length;
-      const row = document.createElement("label");
-      row.className = "bank";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.dataset.key = key;
+        cb.addEventListener("change", () => {
+          if (cb.checked) selectedBanks.add(key);
+          else selectedBanks.delete(key);
+          updateTotal();
+        });
 
-      cb.addEventListener("change", () => {
-        if (cb.checked) selectedBanks.add(key);
-        else selectedBanks.delete(key);
-        updateTotal();
+        const text = document.createElement("div");
+        text.innerHTML = `<div style="font-weight:800">${bank.label}</div>
+                          <div class="muted">${plural(count, "question")}</div>`;
+        row.appendChild(cb);
+        row.appendChild(text);
+        els.banksList.appendChild(row);
       });
-
-      const text = document.createElement("div");
-      text.innerHTML = `<div style="font-weight:800">${bank.label}</div>
-                        <div class="muted">${plural(count, "question")}</div>`;
-
-      row.appendChild(cb);
-      row.appendChild(text);
-      els.banksList.appendChild(row);
-    });
-  }
-
-  function updateTotal() {
-    let total = 0;
-    selectedBanks.forEach(key => {
-      total += banks[key].questions.length;
-    });
-    els.totalPill.textContent = `Total sélectionné: ${total}`;
-    els.startBtn.disabled = total === 0;
-  }
-
-  // Boutons de sélection de masse
-  els.selectAllBtn.addEventListener("click", () => {
-    els.banksList.querySelectorAll("input").forEach(cb => {
-      cb.checked = true;
-      selectedBanks.add(cb.dataset.key);
-    });
-    updateTotal();
-  });
-
-  els.clearBtn.addEventListener("click", () => {
-    els.banksList.querySelectorAll("input").forEach(cb => cb.checked = false);
-    selectedBanks.clear();
-    updateTotal();
-  });
-
-  // ===================== LOGIQUE QUIZ =====================
-  function buildQuiz() {
-    quizQuestions = [];
-    selectedBanks.forEach(key => {
-      quizQuestions.push(...banks[key].questions);
-    });
-    quizQuestions = shuffle(quizQuestions);
-  }
-
-  function renderQuestion() {
-    locked = false;
-    els.nextBtn.disabled = true;
-    els.feedbackText.textContent = "Choisissez une réponse.";
-    els.feedbackText.style.color = "var(--primary-blue)";
-    els.explainText.textContent = "";
-
-    // Reset bouton signaler
-    if(els.openReportBtn) {
-        els.openReportBtn.style.display = "inline-block";
-        els.openReportBtn.disabled = false;
-        els.openReportBtn.innerHTML = "🚩 Signaler";
     }
 
-    const q = quizQuestions[current];
-    els.progressPill.textContent = `Question ${current + 1} / ${quizQuestions.length}`;
-    els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
-    els.questionText.textContent = q.stem;
-    
-    if(els.reportContext) els.reportContext.textContent = `ID Question : ${q.id || "Inconnu"}`;
+    function updateTotal() {
+      let total = 0;
+      selectedBanks.forEach(k => total += banks[k].questions.length);
+      els.totalPill.textContent = `Total sélectionné: ${total}`;
+      els.startBtn.disabled = total === 0;
+    }
 
-    els.choices.innerHTML = "";
-    q.choices.forEach((choice, idx) => {
-      const btn = document.createElement("button");
-      btn.textContent = `${String.fromCharCode(65 + idx)}. ${choice}`;
-      btn.style.opacity = "1"; // Opacité normale au début
-      btn.addEventListener("click", () => handleAnswer(idx));
-      els.choices.appendChild(btn);
-    });
-  }
+    els.selectAllBtn.onclick = () => { els.banksList.querySelectorAll("input").forEach(cb=>{cb.checked=true; selectedBanks.add(cb.dataset.key)}); updateTotal(); };
+    els.clearBtn.onclick = () => { els.banksList.querySelectorAll("input").forEach(cb=>cb.checked=false); selectedBanks.clear(); updateTotal(); };
 
-  function handleAnswer(idx) {
-    if (locked) return;
-    locked = true;
-
-    const q = quizQuestions[current];
-    const correct = q.answerIndex;
-    const buttons = els.choices.querySelectorAll("button");
-
-    buttons.forEach((b, i) => {
-      b.disabled = true;
+    // --- LOGIQUE DU QUIZ ---
+    els.startBtn.addEventListener("click", () => {
+      // 1. Configuration
+      isExamMode = els.examModeToggle.checked; // On regarde l'état de l'interrupteur
+      buildQuiz();
+      current = 0; scoreCorrect = 0; scoreAnswered = 0;
       
-      if (i === correct) {
-        // BONNE RÉPONSE (Vert + Opaque)
-        b.style.background = "#2ecc71";
-        b.style.borderColor = "#2ecc71";
-        b.style.color = "#ffffff";
-        b.style.fontWeight = "bold";
-        b.style.opacity = "1";
-      } else if (i === idx) {
-        // MAUVAISE RÉPONSE CHOISIE (Rouge + Opaque)
-        b.style.background = "#e74c3c";
-        b.style.borderColor = "#e74c3c";
-        b.style.color = "#ffffff";
-        b.style.opacity = "1";
-      } else {
-        // AUTRES RÉPONSES (Transparentes / Fade out)
-        b.style.opacity = "0.4";
-      }
-    });
-
-    // Feedback texte
-    if (idx !== correct) {
-      els.feedbackText.textContent = "Incorrect.";
-      els.feedbackText.style.color = "#e74c3c";
-    } else {
-      els.feedbackText.textContent = "Correct !";
-      els.feedbackText.style.color = "#2ecc71";
-      scoreCorrect++;
-    }
-
-    scoreAnswered++;
-    els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
-    els.nextBtn.disabled = false;
-    
-    if (q.explain) els.explainText.textContent = q.explain;
-
-    // --- ENVOI DES STATISTIQUES ---
-    if (db && q.id) {
-        try {
-            const statsRef = doc(db, "stats", q.id);
-            const updateData = { total: increment(1) };
-            updateData[idx] = increment(1); // Incrémente le choix spécifique (0, 1, 2 ou 3)
-            setDoc(statsRef, updateData, { merge: true }).catch(e => console.error(e));
-        } catch(e) { /* Ignorer erreur stats */ }
-    }
-  }
-
-  function nextQuestion() {
-    if (current < quizQuestions.length - 1) {
-      current++;
-      renderQuestion();
-    } else {
-      els.questionText.textContent = "Quiz terminé !";
-      els.choices.innerHTML = "";
-      els.feedbackText.textContent = `Résultat final : ${scoreCorrect} / ${quizQuestions.length}`;
-      els.feedbackText.style.color = "var(--primary-blue)";
-      els.nextBtn.disabled = true;
-      if(els.openReportBtn) els.openReportBtn.style.display = "none";
-    }
-  }
-
-  // ===================== LOGIQUE DE SIGNALEMENT =====================
-  if(els.openReportBtn) {
-      // Ouvrir
-      els.openReportBtn.addEventListener("click", () => {
-        els.reportModal.style.display = "flex";
-        els.reportReason.value = "";
-        els.reportReason.focus();
+      // 2. Générer la barre de progression (segments vides)
+      els.progressBar.innerHTML = "";
+      quizQuestions.forEach((_, idx) => {
+        const seg = document.createElement("div");
+        seg.className = "progress-segment";
+        seg.id = `seg-${idx}`;
+        els.progressBar.appendChild(seg);
       });
 
-      // Annuler
-      els.cancelReportBtn.addEventListener("click", () => els.reportModal.style.display = "none");
+      // 3. Affichage
+      els.selectionCard.style.display = "none";
+      els.quizCard.style.display = "block";
+      renderQuestion();
+    });
 
-      // Envoyer
-      els.submitReportBtn.addEventListener("click", async () => {
-        const reason = els.reportReason.value.trim();
-        if (!reason) return alert("Veuillez décrire le problème.");
+    function buildQuiz() {
+      quizQuestions = [];
+      selectedBanks.forEach(k => quizQuestions.push(...banks[k].questions));
+      quizQuestions = shuffle(quizQuestions);
+    }
+
+    function renderQuestion() {
+      locked = false;
+      els.nextBtn.disabled = true;
+      els.feedbackText.textContent = isExamMode ? "Mode Examen" : "Choisissez une réponse.";
+      els.feedbackText.style.color = "var(--primary-blue)";
+      els.explainText.textContent = "";
+
+      if(els.openReportBtn) {
+          els.openReportBtn.style.display = "inline-block";
+          els.openReportBtn.disabled = false;
+          els.openReportBtn.innerHTML = "🚩 Signaler";
+      }
+
+      const q = quizQuestions[current];
+      els.progressPill.textContent = `Question ${current + 1} / ${quizQuestions.length}`;
+      
+      // En mode examen, on cache le score actuel
+      if(isExamMode) els.scorePill.textContent = "Score masqué";
+      else els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
+
+      els.questionText.textContent = q.stem;
+      if(els.reportContext) els.reportContext.textContent = `ID: ${q.id}`;
+
+      els.choices.innerHTML = "";
+      q.choices.forEach((choice, idx) => {
+        const btn = document.createElement("button");
+        btn.textContent = `${String.fromCharCode(65 + idx)}. ${choice}`;
+        btn.style.opacity = "1";
+        btn.onclick = () => handleAnswer(idx);
+        els.choices.appendChild(btn);
+      });
+
+      // Mettre le segment de la barre en surbrillance (bleu)
+      const curSeg = document.getElementById(`seg-${current}`);
+      if(curSeg) curSeg.classList.add("active");
+    }
+
+    function handleAnswer(idx) {
+      if (locked) return;
+      locked = true;
+
+      const q = quizQuestions[current];
+      const correct = q.answerIndex;
+      const buttons = els.choices.querySelectorAll("button");
+      
+      // On retire le focus "actif" du segment de la barre
+      const curSeg = document.getElementById(`seg-${current}`);
+      if(curSeg) curSeg.classList.remove("active");
+
+      // Gestion de l'affichage des boutons
+      buttons.forEach((b, i) => {
+        b.disabled = true;
         
-        const q = quizQuestions[current];
-        els.submitReportBtn.innerText = "Envoi...";
-        els.submitReportBtn.disabled = true;
-
-        try {
-          if (!db) throw new Error("Erreur DB");
-          
-          await addDoc(collection(db, "reports"), {
-            questionId: q.id || "unknown",
-            questionStem: q.stem.substring(0, 100) + "...",
-            reason: reason,
-            timestamp: serverTimestamp(),
-            user: sessionStorage.getItem('auth_token') || "anonyme"
-          });
-
-          els.reportModal.style.display = "none";
-          els.openReportBtn.innerHTML = "✅ Signalé";
-          els.openReportBtn.disabled = true;
-          alert("Signalement envoyé !");
-
-        } catch (e) {
-          console.error(e);
-          alert("Erreur lors de l'envoi.");
-        } finally {
-          els.submitReportBtn.innerText = "Envoyer";
-          els.submitReportBtn.disabled = false;
+        if (isExamMode) {
+            // --- MODE EXAMEN : On ne montre pas la réponse ---
+            if (i === idx) {
+                // Juste indiquer ce qu'on a cliqué (Bleu)
+                b.style.background = "#3498db"; 
+                b.style.borderColor = "#3498db";
+                b.style.color = "#fff";
+                b.style.opacity = "1";
+            } else {
+                b.style.opacity = "0.5";
+            }
+        } else {
+            // --- MODE ÉTUDE : Vert / Rouge ---
+            if (i === correct) {
+                b.style.background = "#2ecc71";
+                b.style.borderColor = "#2ecc71";
+                b.style.color = "#fff"; b.style.fontWeight = "bold"; b.style.opacity = "1";
+            } else if (i === idx) {
+                b.style.background = "#e74c3c";
+                b.style.borderColor = "#e74c3c";
+                b.style.color = "#fff"; b.style.opacity = "1";
+            } else {
+                b.style.opacity = "0.4";
+            }
         }
       });
-      
-      // Fermer au clic dehors
-      window.addEventListener("click", (e) => {
-        if (e.target === els.reportModal) els.reportModal.style.display = "none";
-      });
+
+      // Calcul des points
+      if (idx === correct) scoreCorrect++;
+      scoreAnswered++;
+
+      // Feedback Textuel et Barre de progression
+      if (isExamMode) {
+          // Mode Examen
+          els.feedbackText.textContent = "Réponse enregistrée.";
+          els.feedbackText.style.color = "#a0aec0"; // Gris
+          if(curSeg) curSeg.classList.add("answered"); // Gris
+      } else {
+          // Mode Étude
+          if(idx !== correct) {
+              els.feedbackText.textContent = "Incorrect.";
+              els.feedbackText.style.color = "#e74c3c";
+              if(curSeg) curSeg.classList.add("wrong"); // Rouge
+          } else {
+              els.feedbackText.textContent = "Correct !";
+              els.feedbackText.style.color = "#2ecc71";
+              if(curSeg) curSeg.classList.add("correct"); // Vert
+          }
+          els.scorePill.textContent = `Score: ${scoreCorrect} / ${scoreAnswered}`;
+          if (q.explain) els.explainText.textContent = q.explain;
+      }
+
+      els.nextBtn.disabled = false;
+
+      // Envoi des statistiques (Anonyme)
+      if (db && q.id) {
+          const statsRef = doc(db, "stats", q.id);
+          const u = { total: increment(1) }; u[idx] = increment(1);
+          setDoc(statsRef, u, { merge: true }).catch(()=>{});
+      }
+    }
+
+    function nextQuestion() {
+      if (current < quizQuestions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        // Fin du quiz
+        els.questionText.textContent = isExamMode ? "Examen terminé !" : "Quiz terminé !";
+        els.choices.innerHTML = "";
+        
+        let msg = `Résultat final : ${scoreCorrect} / ${quizQuestions.length}`;
+        if(isExamMode) msg += ` (${Math.round(scoreCorrect/quizQuestions.length*100)}%)`;
+        
+        els.feedbackText.textContent = msg;
+        els.feedbackText.style.color = "var(--primary-blue)";
+        els.scorePill.textContent = `Fin: ${scoreCorrect} / ${quizQuestions.length}`;
+        els.nextBtn.disabled = true;
+        if(els.openReportBtn) els.openReportBtn.style.display = "none";
+      }
+    }
+
+    // --- LISTENERS ---
+    els.nextBtn.onclick = nextQuestion;
+    els.backHomeBtn.onclick = () => { if(confirm("Quitter ?")) location.reload(); };
+
+    // Signalement
+    if(els.openReportBtn) {
+        els.openReportBtn.onclick = () => { els.reportModal.style.display="flex"; els.reportReason.value=""; els.reportReason.focus(); };
+        els.cancelReportBtn.onclick = () => els.reportModal.style.display="none";
+        els.submitReportBtn.onclick = async () => {
+            const r = els.reportReason.value.trim();
+            if(!r) return;
+            const q = quizQuestions[current];
+            els.submitReportBtn.disabled = true;
+            try {
+                await addDoc(collection(db, "reports"), {
+                    questionId: q.id||"?", questionStem: q.stem.substring(0,50)+"...",
+                    reason: r, timestamp: serverTimestamp(), user: sessionStorage.getItem('auth_token')||"?"
+                });
+                els.reportModal.style.display="none"; alert("Envoyé!");
+            } catch(e) { console.error(e); } 
+            els.submitReportBtn.disabled = false;
+        };
+        window.onclick = (e) => { if(e.target === els.reportModal) els.reportModal.style.display="none"; };
+    }
+
+    renderBanks();
   }
-
-  // ===================== NAVIGATION =====================
-  els.startBtn.addEventListener("click", () => {
-    buildQuiz();
-    current = 0; scoreCorrect = 0; scoreAnswered = 0;
-    els.selectionCard.style.display = "none";
-    els.quizCard.style.display = "block";
-    renderQuestion();
-  });
-
-  els.nextBtn.addEventListener("click", nextQuestion);
-  
-  els.backHomeBtn.addEventListener("click", () => {
-    if(confirm("Quitter le quiz ?")) location.reload();
-  });
-
-  // ===================== DÉMARRAGE =====================
-  renderBanks();
-  loadCorrectionsBackground();
-
 })();
