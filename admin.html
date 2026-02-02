@@ -3,14 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin - Gestion & Stats</title>
+  <title>Admin - Connexion Requise</title>
   
-  <script>
-    if (sessionStorage.getItem('auth_token') !== 'connected') {
-      window.location.href = 'login.html';
-    }
-  </script>
-
   <style>
     /* --- THÈME DEEP NIGHT --- */
     :root { 
@@ -20,10 +14,33 @@
       --border: rgba(255,255,255,0.1); 
     }
     
-    body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
     .container { max-width: 900px; margin: 0 auto; }
+
+    /* --- ÉCRAN DE LOGIN --- */
+    #login-screen {
+      height: 100vh; display: flex; justify-content: center; align-items: center;
+      position: fixed; top: 0; left: 0; width: 100%; background: var(--bg); z-index: 1000;
+    }
+    .login-box {
+      background: var(--card); padding: 40px; border-radius: 16px; 
+      border: 1px solid var(--border); width: 300px; text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    input {
+      width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border); border-radius: 8px; color: white; box-sizing: border-box;
+    }
+    .btn-login {
+      width: 100%; padding: 12px; background: var(--blue); color: #000; border: none;
+      border-radius: 8px; font-weight: bold; cursor: pointer;
+    }
+    .btn-login:hover { opacity: 0.9; }
+
+    /* --- UI ADMIN --- */
+    #admin-ui { display: none; } /* Caché par défaut */
     
-    h1 { color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    h1 { color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
     .filter-bar { margin: 20px 0; display: flex; gap: 10px; }
     select { padding: 12px; background: var(--card); color: white; border: 1px solid var(--border); border-radius: 8px; flex-grow: 1; font-size: 16px; cursor: pointer; }
@@ -43,55 +60,58 @@
 
     .q-stem { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; line-height: 1.5; }
     
-    /* Choix avec barre de stats */
+    /* Choix */
     .choice { 
       padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; 
       cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
       display: flex; justify-content: space-between; align-items: center; z-index: 1;
     }
     .choice:hover { border-color: var(--blue); }
-    
-    /* Le texte doit être au dessus de la barre de stat */
     .choice span { position: relative; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-
-    /* Barre de progression statistique (background) */
     .stat-bar {
       position: absolute; top: 0; left: 0; height: 100%;
-      background: rgba(255, 255, 255, 0.08); /* Gris transparent */
-      z-index: 0; transition: width 0.5s ease;
+      background: rgba(255, 255, 255, 0.08); z-index: 0; transition: width 0.5s ease;
     }
-    
     .is-correct { border-color: var(--green); }
-    /* La barre de stat pour la bonne réponse est verte très pâle */
     .is-correct .stat-bar { background: rgba(46, 204, 113, 0.2); }
-
     .stat-percent { font-size: 0.85em; color: var(--text); opacity: 0.7; margin-left: 10px; min-width: 40px; text-align: right; }
 
-    /* Zone de signalement */
-    .report-box {
-      background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--red);
-      padding: 15px; margin-bottom: 15px; border-radius: 4px;
-    }
-    .report-item { 
-      display: flex; justify-content: space-between; align-items: flex-start; 
-      margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;
-    }
+    /* Signalement */
+    .report-box { background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--red); padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+    .report-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
     .btn-delete { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.7; }
     .btn-delete:hover { opacity: 1; transform: scale(1.1); }
 
-    .btn-home {
-      display: inline-block; text-decoration: none; color: var(--text); 
-      background: var(--card); border: 1px solid var(--border); 
-      padding: 8px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px;
-    }
+    .btn-logout { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-home { text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; display: inline-block;}
+    
+    #login-error { color: var(--red); margin-top: 10px; font-size: 13px; display: none; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <a href="index.html" class="btn-home">← Retour au Quiz</a>
+<div id="login-screen">
+  <div class="login-box">
+    <h2 style="margin-top:0; color:var(--blue)">Admin Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email Admin" required>
+      <input type="password" id="password" placeholder="Mot de passe" required>
+      <button type="submit" class="btn-login" id="loginBtn">Se connecter</button>
+      <div id="login-error">Erreur d'authentification</div>
+    </form>
+    <a href="index.html" style="color:var(--text); font-size:12px; display:block; margin-top:20px;">Retour au site</a>
+  </div>
+</div>
+
+<div id="admin-ui" class="container">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <a href="index.html" class="btn-home">← Retour au Quiz</a>
+    <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+  </div>
   
-  <h1>🕵️‍♂️ Console d'Administration & Stats</h1>
+  <h1>
+    🕵️‍♂️ Console d'Administration
+  </h1>
   
   <div class="filter-bar">
     <select id="bankSelector"><option value="">Chargement...</option></select>
@@ -128,6 +148,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   // --- CONFIGURATION FIREBASE ---
@@ -142,88 +163,126 @@
   };
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // Variables
   const banks = window.QUIZ_BANKS || {};
   let correctionsMap = {};
   let reportsMap = {};
-  let statsMap = {}; // Stockage des statistiques
+  let statsMap = {};
+  let dataLoaded = false;
 
-  async function init() {
+  // --- GESTION AUTHENTIFICATION ---
+  const loginScreen = document.getElementById('login-screen');
+  const adminUi = document.getElementById('admin-ui');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('login-error');
+
+  // Surveiller l'état de connexion
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Connecté
+      loginScreen.style.display = 'none';
+      adminUi.style.display = 'block';
+      if (!dataLoaded) initData(); // Charger les données seulement si connecté
+    } else {
+      // Déconnecté
+      loginScreen.style.display = 'flex';
+      adminUi.style.display = 'none';
+      dataLoaded = false;
+    }
+  });
+
+  // Login
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('loginBtn');
+    
+    btn.innerText = "Connexion...";
+    loginError.style.display = 'none';
+
+    signInWithEmailAndPassword(auth, email, password)
+      .catch((error) => {
+        console.error(error);
+        loginError.style.display = 'block';
+        loginError.innerText = "Email ou mot de passe incorrect.";
+      })
+      .finally(() => {
+        btn.innerText = "Se connecter";
+      });
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    signOut(auth);
+  });
+
+  // --- LOGIQUE ADMIN (Identique à avant) ---
+
+  async function initData() {
     await Promise.all([loadCorrections(), loadReports(), loadStats()]);
     initUI();
+    dataLoaded = true;
   }
 
-  // 1. Charger les corrections
   async function loadCorrections() {
     try {
       const snapshot = await getDocs(collection(db, "corrections"));
-      snapshot.forEach(doc => {
-        correctionsMap[doc.id] = doc.data().answerIndex;
-      });
+      snapshot.forEach(doc => correctionsMap[doc.id] = doc.data().answerIndex);
     } catch (e) { console.error("Erreur corrections:", e); }
   }
 
-  // 2. Charger les signalements
   async function loadReports() {
     try {
+      reportsMap = {}; // Reset
       const snapshot = await getDocs(collection(db, "reports"));
       snapshot.forEach(doc => {
         const data = doc.data();
         const qId = data.questionId;
         if (!reportsMap[qId]) reportsMap[qId] = [];
         reportsMap[qId].push({ 
-          id: doc.id, 
-          reason: data.reason, 
+          id: doc.id, reason: data.reason, 
           date: data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : '?' 
         });
       });
     } catch (e) { console.error("Erreur signalements:", e); }
   }
 
-  // 3. Charger les statistiques (NOUVEAU)
   async function loadStats() {
     try {
       const snapshot = await getDocs(collection(db, "stats"));
-      snapshot.forEach(doc => {
-        statsMap[doc.id] = doc.data(); // Contient { "0": 5, "1": 12, "total": 17 }
-      });
+      snapshot.forEach(doc => statsMap[doc.id] = doc.data());
     } catch (e) { console.error("Erreur stats:", e); }
   }
 
-  // 4. Interface
   function initUI() {
     const selector = document.getElementById("bankSelector");
-    
     let options = '<option value="all">Toutes les banques</option>';
     options += '<option value="reported" style="background:#3c1f1f; color:#e74c3c; font-weight:bold;">⚠️ Voir les Signalements</option>';
     options += '<option disabled>------------------------</option>';
-    
-    Object.keys(banks).forEach(key => {
-      options += `<option value="${key}">${banks[key].label}</option>`;
-    });
+    Object.keys(banks).forEach(key => options += `<option value="${key}">${banks[key].label}</option>`);
     
     selector.innerHTML = options;
-    selector.addEventListener("change", () => renderQuestions(selector.value));
+    selector.onchange = () => renderQuestions(selector.value);
     renderQuestions("all");
   }
 
   function renderQuestions(bankKey) {
     const list = document.getElementById("questionsList");
     list.innerHTML = "";
-
     let questionsToShow = [];
     
     if (bankKey === "reported") {
       Object.values(banks).forEach(b => {
         b.questions.forEach(q => {
-          if (reportsMap[q.id] && reportsMap[q.id].length > 0) {
-            questionsToShow.push(q);
-          }
+          if (reportsMap[q.id] && reportsMap[q.id].length > 0) questionsToShow.push(q);
         });
       });
       if (questionsToShow.length === 0) {
-        list.innerHTML = "<div style='text-align:center; padding:40px; color:#aaa;'>Aucun signalement en cours.</div>";
+        list.innerHTML = "<div style='text-align:center; padding:40px; color:#aaa;'>Aucun signalement.</div>";
         return;
       }
     } else if (bankKey === "all") {
@@ -232,9 +291,7 @@
       questionsToShow = banks[bankKey].questions;
     }
 
-    if(bankKey !== "reported" && questionsToShow.length > 600) {
-        questionsToShow = questionsToShow.slice(0, 600);
-    }
+    if(bankKey !== "reported" && questionsToShow.length > 600) questionsToShow = questionsToShow.slice(0, 600);
 
     questionsToShow.forEach(q => {
       const card = document.createElement("div");
@@ -243,103 +300,79 @@
       const savedIndex = correctionsMap[q.id];
       const currentIndex = (savedIndex !== undefined) ? savedIndex : q.answerIndex;
       const isModified = (savedIndex !== undefined && savedIndex !== q.answerIndex);
-      
-      const reports = reportsMap[q.id];
-      const hasReports = reports && reports.length > 0;
-      
-      // Récupérer les stats pour cette question
+      const reports = reportsMap[q.id] || [];
+      const hasReports = reports.length > 0;
       const qStats = statsMap[q.id] || { total: 0 };
       const totalVotes = qStats.total || 0;
 
-      if (isModified) card.classList.add("is-overridden");
       if (hasReports) card.style.border = "2px solid #e74c3c";
 
       let html = `<div class="q-header">
-                    <span>ID: ${q.id} <span style="font-weight:normal; opacity:0.6; margin-left:10px">(${totalVotes} réponses)</span></span>
+                    <span>ID: ${q.id} <span style="font-weight:normal; opacity:0.6;">(${totalVotes} votes)</span></span>
                     <div>
                         ${isModified ? '<span class="badge badge-mod">✏️ MODIFIÉ</span>' : ''}
-                        ${hasReports ? `<span class="badge badge-alert">⚠️ ${reports.length} SIGNALEMENT(S)</span>` : ''}
+                        ${hasReports ? `<span class="badge badge-alert">⚠️ ${reports.length}</span>` : ''}
                     </div>
                   </div>
                   <div class="q-stem">${q.stem}</div>`;
 
       if (hasReports) {
-        html += `<div class="report-box">
-                   <strong style="color:var(--red)">Plaintes utilisateurs :</strong>
-                   <div style="margin-top:10px">`;
+        html += `<div class="report-box"><strong style="color:var(--red)">Plaintes :</strong><div style="margin-top:10px">`;
         reports.forEach(r => {
-          html += `<div class="report-item">
-                     <span>"${r.reason}" <em style="opacity:0.6; font-size:0.8em">(${r.date})</em></span>
-                     <button onclick="window.deleteReport('${r.id}', this)" class="btn-delete">🗑️</button>
-                   </div>`;
+          html += `<div class="report-item"><span>"${r.reason}"</span>
+                     <button onclick="window.deleteReport('${r.id}', this)" class="btn-delete">🗑️</button></div>`;
         });
         html += `</div></div>`;
       }
 
       q.choices.forEach((choice, idx) => {
         const isSelected = (idx === currentIndex);
-        const safeId = q.id.replace(/'/g, "\\'"); 
-        
-        // Calcul du pourcentage
         const count = qStats[idx] || 0;
-        let percent = 0;
-        if (totalVotes > 0) {
-            percent = Math.round((count / totalVotes) * 100);
-        }
+        const percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+        const safeId = q.id.replace(/'/g, "\\'");
 
-        html += `<div class="choice ${isSelected ? 'is-correct' : ''}" 
-                      onclick="window.updateAnswer('${safeId}', ${idx}, this)">
-                   
+        html += `<div class="choice ${isSelected ? 'is-correct' : ''}" onclick="window.updateAnswer('${safeId}', ${idx}, this)">
                    <div class="stat-bar" style="width: ${percent}%;"></div>
-                   
                    <span>${String.fromCharCode(65+idx)}. ${choice}</span>
-                   
                    <span style="position:relative; z-index:2; display:flex; align-items:center;">
                      <span class="stat-percent">${percent}%</span>
                      ${isSelected ? '<span style="margin-left:8px">✅</span>' : ''}
                    </span>
                  </div>`;
       });
-
       card.innerHTML = html;
       list.appendChild(card);
     });
   }
 
-  window.updateAnswer = async function(questionId, newIndex, element) {
-    if (!confirm("Voulez-vous définir cette réponse comme la nouvelle bonne réponse ?")) return;
+  // Fonctions Globales
+  window.updateAnswer = async function(qId, newIndex, el) {
+    if (!confirm("Changer la bonne réponse ?")) return;
     try {
-      await setDoc(doc(db, "corrections", questionId), {
-        answerIndex: newIndex,
-        updatedAt: new Date().toISOString()
+      await setDoc(doc(db, "corrections", qId), { answerIndex: newIndex, updatedAt: new Date().toISOString() });
+      const parent = el.parentElement;
+      parent.querySelectorAll('.choice').forEach(c => {
+        c.classList.remove('is-correct');
+        const chk = c.querySelector('span span:last-child');
+        if(chk && chk.innerText === "✅") chk.remove();
       });
-      // Recharge simple pour mettre à jour l'affichage des checks (les stats restent)
-      const parent = element.parentElement;
-      parent.querySelectorAll('.choice').forEach(el => {
-        el.classList.remove('is-correct');
-        const check = el.querySelector('span span:last-child');
-        if(check && check.innerText === "✅") check.remove();
-      });
-      element.classList.add('is-correct');
-      element.querySelector('span').innerHTML += '<span style="margin-left:8px">✅</span>';
-      element.closest('.q-card').querySelector('.q-header div').innerHTML += '<span class="badge badge-mod">✏️ MODIFIÉ</span>';
-    } catch (e) { alert("Erreur sauvegarde : " + e.message); }
+      el.classList.add('is-correct');
+      el.querySelector('span').innerHTML += '<span style="margin-left:8px">✅</span>';
+      
+      const hdr = el.closest('.q-card').querySelector('.q-header div');
+      if(!hdr.querySelector('.badge-mod')) hdr.innerHTML = '<span class="badge badge-mod">✏️ MODIFIÉ</span>' + hdr.innerHTML;
+      
+    } catch (e) { alert("Erreur: " + e.message); }
   };
 
-  window.deleteReport = async function(reportId, btnElement) {
+  window.deleteReport = async function(rId, btn) {
     if(!confirm("Supprimer ce signalement ?")) return;
     try {
-      await deleteDoc(doc(db, "reports", reportId));
-      const item = btnElement.parentElement;
-      const box = item.parentElement.parentElement; // Remonter au container
-      item.remove();
-      if(box.querySelector('.report-item') === null) {
-          box.remove();
-      }
+      await deleteDoc(doc(db, "reports", rId));
+      btn.parentElement.remove();
     } catch(e) { console.error(e); }
   };
 
-  init();
 </script>
 </body>
 </html>
