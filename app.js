@@ -21,30 +21,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// --- LISTE SÉCURISÉE DES BANQUES ---
-const SECRET_FOLDER = "assets_x92m_secure_v4"; 
-const BANK_FILES = [
-  "bank-2021.js", "bank-2022.js", "bank-2023.js", "bank-2024.js", 
-  "bank-2025.js", "bank-CL.js", "bank-TP.js", "bank-TUS.js", 
-  "bank-alimentaire.js", "bank-anxiete.js", "bank-cope.js", 
-  "bank-depression.js", "bank-epidemio.js", "bank-geronto.js", 
-  "bank-legal.js", "bank-mab.js", "bank-pedopsy.js", 
-  "bank-perinat.js", "bank-pharmatothx.js", "bank-psychose.js", 
-  "bank-psychotherapie.js", "bank-sommeil.js", "bank-usa6.js", 
-  "bank-usa5.js", "bank-cope-2025.js"
-];
-
-function loadScript(fileName) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = `./${SECRET_FOLDER}/${fileName}`;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.body.appendChild(script);
-  });
-}
-
-// --- INJECTION CSS POUR LA RÉVISION (Pour garantir l'affichage) ---
+// --- CSS POUR LA RÉVISION (Mode Examen) ---
 const reviewStyle = document.createElement('style');
 reviewStyle.innerHTML = `
   .review-item { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: left; }
@@ -56,7 +33,6 @@ reviewStyle.innerHTML = `
 `;
 document.head.appendChild(reviewStyle);
 
-
 // --- FONCTION PRINCIPALE ---
 (function () {
   
@@ -66,18 +42,13 @@ document.head.appendChild(reviewStyle);
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       console.log("Connecté.");
-      try {
-        // Chargement des scripts
-        await Promise.all(BANK_FILES.map(file => loadScript(file)));
-        if(selectionCard) {
-            selectionCard.style.transition = "opacity 0.5s";
-            selectionCard.style.opacity = "1";
-        }
-        initApp();
-      } catch (err) {
-        console.error(err);
-        alert("Erreur de chargement des questions.");
+      // On rend l'interface visible
+      if(selectionCard) {
+          selectionCard.style.transition = "opacity 0.5s";
+          selectionCard.style.opacity = "1";
       }
+      // On lance l'application directement (les banques sont déjà chargées par index.html)
+      initApp();
     } else {
       window.location.href = 'login.html';
     }
@@ -114,6 +85,8 @@ document.head.appendChild(reviewStyle);
       reportContext: document.getElementById("reportContext")
     };
 
+    // --- RÉCUPÉRATION DES BANQUES ---
+    // C'est ici que ça change : on lit directement la fenêtre globale
     const banks = window.QUIZ_BANKS || {};
     const bankKeys = Object.keys(banks);
     const selectedBanks = new Set();
@@ -124,9 +97,9 @@ document.head.appendChild(reviewStyle);
     let scoreAnswered = 0;
     let locked = false;
     let isExamMode = false;
-    let wrongAnswers = []; // Stockage des erreurs
+    let wrongAnswers = []; 
 
-    // --- CHARGEMENT CORRECTIONS ---
+    // --- CHARGEMENT CORRECTIONS FIREBASE ---
     try {
       if(db) {
         const snapshot = await getDocs(collection(db, "corrections"));
@@ -138,8 +111,11 @@ document.head.appendChild(reviewStyle);
             if (q) q.answerIndex = newIndex;
           }
         });
+        console.log("Corrections appliquées.");
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Corrections indisponibles (Brave Shields ou Hors Ligne ?)");
+    }
 
     // --- UTILS ---
     function shuffle(a) { return a.sort(() => Math.random() - 0.5); }
@@ -148,6 +124,13 @@ document.head.appendChild(reviewStyle);
     // --- UI SELECTION ---
     function renderBanks() {
       els.banksList.innerHTML = "";
+      
+      if(bankKeys.length === 0) {
+          // Si Brave ou autre bloque les scripts locaux
+          els.banksList.innerHTML = "<div style='padding:20px; color:#e74c3c'>Aucune banque détectée.<br>Si vous utilisez Brave, désactivez les 'Shields' ou vérifiez que les fichiers bank-xxx.js sont bien dans le dossier /banks.</div>";
+          return;
+      }
+
       bankKeys.forEach(key => {
         const bank = banks[key];
         const count = bank.questions.length;
@@ -187,9 +170,8 @@ document.head.appendChild(reviewStyle);
       buildQuiz();
       
       current = 0; scoreCorrect = 0; scoreAnswered = 0;
-      wrongAnswers = []; // Reset important
+      wrongAnswers = [];
       
-      // Barre de progression
       els.progressBar.innerHTML = "";
       quizQuestions.forEach((_, idx) => {
         const seg = document.createElement("div");
@@ -254,12 +236,10 @@ document.head.appendChild(reviewStyle);
       buttons.forEach((b, i) => {
         b.disabled = true;
         if (isExamMode) {
-            // Mode Examen : Bleu seulement
             if (i === idx) {
                 b.style.background = "#3498db"; b.style.borderColor = "#3498db"; b.style.color = "#fff"; b.style.opacity = "1";
             } else { b.style.opacity = "0.5"; }
         } else {
-            // Mode Étude : Vert/Rouge
             if (i === correct) {
                 b.style.background = "#2ecc71"; b.style.borderColor = "#2ecc71"; b.style.color = "#fff"; b.style.fontWeight="bold"; b.style.opacity="1";
             } else if (i === idx) {
@@ -268,11 +248,9 @@ document.head.appendChild(reviewStyle);
         }
       });
 
-      // Logique de points
       if (idx === correct) {
           scoreCorrect++;
       } else {
-          // Si c'est faux, on ajoute aux erreurs
           wrongAnswers.push({
               question: q,
               userChoice: idx,
@@ -301,7 +279,7 @@ document.head.appendChild(reviewStyle);
 
       els.nextBtn.disabled = false;
 
-      // Stats Firebase
+      // Stats
       if (db && q.id) {
           const statsRef = doc(db, "stats", q.id);
           const u = { total: increment(1) }; u[idx] = increment(1);
@@ -328,36 +306,30 @@ document.head.appendChild(reviewStyle);
         els.feedbackText.style.color = "var(--primary-blue)";
         els.scorePill.textContent = `Fin: ${scoreCorrect} / ${quizQuestions.length}`;
         els.nextBtn.disabled = true;
-        
-        // Cacher bouton signaler à la fin
         if(els.openReportBtn) els.openReportBtn.style.display = "none";
         
-        // --- LOGIQUE D'AFFICHAGE DU BOUTON ERREURS ---
-        els.choices.innerHTML = ""; // On nettoie la zone des boutons
+        // Nettoyage zone boutons
+        els.choices.innerHTML = "";
 
+        // Afficher bouton révision si Examen
         if (isExamMode) {
             if (wrongAnswers.length > 0) {
-                // Création du bouton Révision
                 const btn = document.createElement("button");
                 btn.textContent = `🔍 Voir mes ${wrongAnswers.length} erreurs`;
-                btn.style.background = "#f1c40f"; // Jaune
+                btn.style.background = "#f1c40f"; 
                 btn.style.color = "#000";
                 btn.style.border = "none";
                 btn.style.padding = "15px";
                 btn.style.fontSize = "18px";
                 btn.style.marginTop = "20px";
                 btn.style.cursor = "pointer";
-                
-                // Au clic, on lance la fonction d'affichage
                 btn.onclick = () => showExamReview();
-                
                 els.choices.appendChild(btn);
             } else {
-                els.choices.innerHTML = "<div style='text-align:center; color:#2ecc71; font-size:1.2em; padding:20px;'>🎉 Score parfait ! Aucune erreur.</div>";
+                els.choices.innerHTML = "<div style='text-align:center; color:#2ecc71; font-size:1.2em; padding:20px;'>🎉 Score parfait !</div>";
             }
         }
         
-        // Bouton retour accueil (toujours utile)
         const homeBtn = document.createElement("button");
         homeBtn.textContent = "Retour à l'accueil";
         homeBtn.style.marginTop = "10px";
@@ -368,25 +340,20 @@ document.head.appendChild(reviewStyle);
         els.choices.appendChild(homeBtn);
     }
 
-    // --- FONCTION D'AFFICHAGE DE LA LISTE D'ERREURS ---
     function showExamReview() {
-        // On change le titre
         els.questionText.textContent = "Révision des erreurs";
         els.feedbackText.textContent = "";
-        els.choices.innerHTML = ""; // On vide tout
+        els.choices.innerHTML = "";
         
-        // On génère la liste
         wrongAnswers.forEach((item, index) => {
             const q = item.question;
             const card = document.createElement("div");
             card.className = "review-item";
             
             let html = `<div class="review-stem">${index + 1}. ${q.stem}</div>`;
-            
             q.choices.forEach((choice, idx) => {
                 let className = "review-choice";
                 let suffix = "";
-                
                 if (idx === item.userChoice) {
                     className += " user-wrong";
                     suffix = " ❌ (Votre choix)";
@@ -394,21 +361,16 @@ document.head.appendChild(reviewStyle);
                     className += " correct-answer";
                     suffix = " ✅ (Bonne réponse)";
                 }
-                
                 html += `<div class="${className}">${String.fromCharCode(65 + idx)}. ${choice} ${suffix}</div>`;
             });
-            
-            if (q.explain) {
-                html += `<div class="review-explain">ℹ️ ${q.explain}</div>`;
-            }
+            if (q.explain) html += `<div class="review-explain">ℹ️ ${q.explain}</div>`;
             
             card.innerHTML = html;
             els.choices.appendChild(card);
         });
 
-        // Bouton pour fermer en bas
         const closeBtn = document.createElement("button");
-        closeBtn.textContent = "Fermer et Retourner à l'accueil";
+        closeBtn.textContent = "Retourner à l'accueil";
         closeBtn.style.marginTop = "20px";
         closeBtn.onclick = () => location.reload();
         els.choices.appendChild(closeBtn);
