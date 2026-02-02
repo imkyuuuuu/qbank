@@ -3,22 +3,21 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Connexion - Quiz Psychiatrie</title>
+  <title>Connexion - Psychiatrie</title>
   <style>
+    /* --- THÈME DEEP NIGHT --- */
     :root {
       --bg-color: #0b1021;
       --card-bg: #161c33;
       --primary-blue: #4dabf7;
-      --accent-blue: #1f2a4d;
       --text-main: #e9ecf5;
-      --text-muted: #a0aec0;
       --border-color: rgba(255, 255, 255, 0.1);
       --error: #e74c3c;
     }
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, sans-serif;
       background: var(--bg-color);
       color: var(--text-main);
       display: flex;
@@ -32,34 +31,24 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 40px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       width: 100%;
       max-width: 350px;
       text-align: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     }
 
-    h1 {
-      margin: 0 0 24px 0;
-      color: var(--primary-blue);
-      font-size: 24px;
-    }
+    h1 { margin: 0 0 10px 0; color: var(--primary-blue); }
+    p { margin: 0 0 30px 0; font-size: 14px; opacity: 0.7; }
 
     input {
       width: 100%;
       padding: 12px;
-      margin-bottom: 16px;
-      background: rgba(255, 255, 255, 0.05);
+      margin-bottom: 15px;
+      background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      color: var(--text-main);
-      font-size: 16px;
-      box-sizing: border-box; /* Important pour le padding */
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--primary-blue);
-      background: var(--accent-blue);
+      color: white;
+      box-sizing: border-box;
     }
 
     button {
@@ -69,65 +58,90 @@
       border-radius: 8px;
       background: var(--primary-blue);
       color: #0b1021;
-      font-weight: 700;
-      font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
-      transition: opacity 0.2s;
+      font-size: 16px;
     }
+    button:hover { opacity: 0.9; }
 
-    button:hover {
-      opacity: 0.9;
-    }
-
-    #errorMsg {
-      color: var(--error);
-      margin-top: 16px;
-      font-size: 14px;
-      display: none;
-    }
+    #errorMsg { color: var(--error); margin-top: 15px; font-size: 14px; display: none; }
   </style>
 </head>
 <body>
 
   <div class="login-card">
-    <h1>Quiz Psychiatrie</h1>
+    <h1>Psychiatrie</h1>
+    <p>Veuillez vous identifier</p>
+    
     <form id="loginForm">
-      <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="username" required>
-      <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
-      <button type="submit">Se connecter</button>
+      <input type="text" id="email" placeholder="Email ou Identifiant" required>
+      <input type="password" id="password" placeholder="Mot de passe" required>
+      <button type="submit" id="submitBtn">Se connecter</button>
     </form>
+    
     <div id="errorMsg">Identifiants incorrects.</div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // --- VOS CLÉS FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyAYVxT8Le90OB0XFfqxinI1bYnwWBMqAGY",
+        authDomain: "qbank-c06a6.firebaseapp.com",
+        projectId: "qbank-c06a6",
+        storageBucket: "qbank-c06a6.firebasestorage.app",
+        messagingSenderId: "872766547331",
+        appId: "1:872766547331:web:bd270985956702c99142b6",
+        measurementId: "G-KBMXFQ96HH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     const form = document.getElementById('loginForm');
     const errorMsg = document.getElementById('errorMsg');
-
-    // Identifiants définis
-    const VALID_USER = "psychiatrie";
-    const VALID_PASS = "2026";
+    const btn = document.getElementById('submitBtn');
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
+      let email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-      if (user === VALID_USER && pass === VALID_PASS) {
-        // Stockage de la session
-        sessionStorage.setItem('auth_token', 'connected');
-        // Redirection vers l'index
-        window.location.href = 'index.html';
-      } else {
-        errorMsg.style.display = 'block';
-        // Animation de secousse (optionnel)
-        document.querySelector('.login-card').animate([
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(-10px)' },
-          { transform: 'translateX(10px)' },
-          { transform: 'translateX(0)' }
-        ], { duration: 300 });
+      // Petit raccourci : si l'utilisateur tape juste "etudiant", on ajoute le reste
+      if (!email.includes('@')) {
+        email += "@quiz.com";
       }
+
+      btn.innerText = "Vérification...";
+      errorMsg.style.display = 'none';
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // --- SUCCÈS ---
+          // On stocke le token "connected" pour la compatibilité avec vos scripts existants
+          sessionStorage.setItem('auth_token', 'connected');
+          
+          // Vérification de qui est connecté pour la redirection
+          if (email.toLowerCase() === "imkyuuuuu@gmail.com") {
+             window.location.href = 'admin.html';
+          } else {
+             window.location.href = 'index.html';
+          }
+        })
+        .catch((error) => {
+          // --- ERREUR ---
+          console.error(error.code);
+          btn.innerText = "Se connecter";
+          errorMsg.style.display = 'block';
+          if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+             errorMsg.innerText = "Identifiant ou mot de passe incorrect.";
+          } else {
+             errorMsg.innerText = "Erreur de connexion (" + error.code + ")";
+          }
+        });
     });
   </script>
 </body>
