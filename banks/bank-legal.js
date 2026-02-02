@@ -34,7 +34,7 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2025_05",
-      stem: "Homme 72 ans désorganisé, inapte, MoCA 16-20. Décision probable du juge ?",
+      stem: "88.	Homme de 72 ans, sans antécédents psychiatriques. Accusé de voie de fait, alors qu’il avait de la désorganisation et consommé de l’alcool (? pu certaine). Jugé inapte à comparaître par le juge, qui a ordonné une ordonnance de soins de 60 jours pour le rendre apte. A l’hôpital, malgré les traitements, l’état clinique du patient ne s’améliore pas. Il ne se souvient pas des accusations, ne sait pas où il est et vous demande à tous les jours qui vous êtes. Son MoCa est à 16-20/30. Il doit repasser en cour demain. Quelle décision risque de prendre le juge ? ",
       choices: ["Déclarer NCR", "Détention 1 an", "Renvoi à la CETM", "Ordonnance de traitement"],
       answerIndex: 2,
       tags: ["2025", "légal"]
@@ -71,7 +71,7 @@ window.QUIZ_BANKS["bank-legal"] = {
       id: "leg_2025_10",
       stem: "Principal principe de la CETM pour ajuster des conditions ?",
       choices: ["Sécurité du public", "Mesure la moins privative de liberté possible", "État clinique actuel"],
-      answerIndex: 1,
+      answerIndex: 0,
       tags: ["2025", "légal"]
     },
     {
@@ -85,7 +85,7 @@ window.QUIZ_BANKS["bank-legal"] = {
     // ===================== 2024 =====================
     {
       id: "leg_2024_01",
-      stem: "Supervision : l'externe porte un jersey de sport pendant l'entrevue. Action ?",
+      stem: "Vous supervisez un externe en médecine, il est professionnel et empathique, très bon avec les patients. Alors qu’il fait un entrevue avec un patient, il retire sa veste et il porte un jersey écrit «Edmonton Eskimos». Que faites-vous? ",
       choices: ["Lui en parler après", "Arrêter l'entrevue", "Lui demander de sortir", "Écrire au doyen"],
       answerIndex: 0,
       tags: ["2024", "éthique"]
@@ -99,7 +99,7 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2024_03",
-      stem: "Patiente TP divorce, suspects maltraitance ex-mari (3 signalements infondés). Aide ?",
+      stem: "Patiente TP mixte? (anxiété, colère), qui vous est référé pour une thérapie. Elle est dans un divorce difficile x 1 an. Elle suspecte que son ex-conjoint maltraite les enfants, elle a fait 3 signalements non retenus par DPJ après enquête standard, elle veut pas faire de nouveau signalement. Quoi faire pour l’aider?  ",
       choices: ["Signaler à nouveau", "Rassurer qu'il ne faut pas signaler", "Thérapie pour l'anxiété et la colère"],
       answerIndex: 2,
       tags: ["2024", "éthique"]
@@ -129,9 +129,9 @@ window.QUIZ_BANKS["bank-legal"] = {
     // ===================== 2023 =====================
     {
       id: "leg_2023_01",
-      stem: "Syndrome de Diogène, MMSE 30/30, danger de feu. Prochaine étape ?",
+      stem: "Femmes avec 6 ou 7 chats chez elle.  Appel des policiers pour qu’on l’évalue suite à plainte de voisins qui sentaient odeur de fumée.  On va voir son logement et constatons que odeur nauséabonde et plusieurs déchets qui traine.  Elle dit avoir oublié seulement une fois une casserole sur la cuisinière.  Elle dit avoir toujours vécu ainsi et veut qu’on quitte son logement.  Elle au un MMSE à 30/30.  Pas d’autre mention de symptôme psychiatrique.  Quelle serait la prochaine étape à entreprendre ? ",
       choices: ["Évaluer aptitude à vivre en logement", "Admission forcée", "Appeler famille"],
-      answerIndex: 0,
+      answerIndex: 2,
       tags: ["2023", "légal"]
     },
     {
@@ -151,28 +151,28 @@ window.QUIZ_BANKS["bank-legal"] = {
     {
       id: "leg_2023_04",
       stem: "Loi C7 AMM. Nouveauté ?",
-      choices: ["Entente pour renoncer au consentement final", "Inscrire AMM au testament"],
+      choices: ["Il est maintenant possible pour les patients dans des conditions très particulières de compléter une entente pour renoncer au consentement final si elles sont à risque de perdre leur capacité à consentir dans l’intervalle. ", "Inscrire AMM au testament"],
       answerIndex: 0,
       tags: ["2023", "légal"]
     },
     {
       id: "leg_2023_05",
-      stem: "Membre d'un groupe utilise un terme inadéquat. Approche ?",
-      choices: ["Intervenir immédiatement", "Parler au président après", "Ne rien dire"],
-      answerIndex: 1,
+      stem: "MOn est dans un groupe visant éducation sur enjeu de diversité.  Un membre du groupe emploi un terme qui vient nous heurter et que l’on juge inadéquat pour parler d’une autre personne.  Quelle approche serait la plus adéquate ? ",
+      choices: ["Intervenir immédiatement pour lui demander s’il a remarqué que son propos est inadéquat ", "Parler au président après", "Ne rien dire"],
+      answerIndex: 0,
       tags: ["2023", "éthique"]
     },
     {
       id: "leg_2023_06",
-      stem: "Patient suicidaire refuse que son conjoint soit informé. Conjoint appelle. Que faire ?",
-      choices: ["Écouter sans divulguer", "Accepter infos ciblées uniquement", "Refuser de parler"],
+      stem: "Patient non-binaire, a séjourné à l’urgence pour intoxication volontaire avec citalopram, n’ayant pas mis sa vie en péril.  Le patient veut quitter après quelques heures disant ne plus être suicidaire.  Il ne veut pas qu’on informe son conjoint de la tentative de suicide, mais son conjoint demande à nous parler.  Que faire ? ",
+      choices: ["Il est possible d’écouter ce que le conjoint a à nous dire et de poser des questions sans divulguer d’information sur le patient. ", "Accepter infos ciblées uniquement", "Refuser de parler"],
       answerIndex: 0,
       tags: ["2023", "légal"]
     },
     {
       id: "leg_2023_07",
-      stem: "Patient tendu sur sa civière, refuse Rx. Action ?",
-      choices: ["Équipe de sécurité", "Menace de Rx IM", "Attention à nos propres ressentis"],
+      stem: "Patient connu de l’urgence psy, psychotique, revient souvent et a déjà présenté de l’agressivité. Il est irritable. L’infirmière lui a proposé de prendre de la médication mais il a refusé. Vous le regardez à travers le poste, et vous le voyez assis sur sa civière, visiblement tendu. Quoi faire à ce point-ci? ",
+      choices: ["Équipe de sécurité", "Menace de Rx IM", "Attention à nos propres ressentis pour permettre une déescalade"],
       answerIndex: 2,
       tags: ["2023", "éthique"]
     },
@@ -201,35 +201,35 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2022_03",
-      stem: "Enseignant blesse un résident autochtone. Action du directeur ?",
+      stem: "Enseignant a des propos blessants sur un résident autochtone. Action du directeur ?",
       choices: ["Demander au résident de s'affirmer", "Formation départementale culturelle", "Approche post-colonialiste"],
       answerIndex: 1,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_04",
-      stem: "Patiente TPL négligée à l'urgence. Exemple de :",
+      stem: "3.	Pte avec diagnostic de TPL qui se présente à l’urgence à la suite de lacérations.  Elle est négligée par l’équipe médicale et ne reçoit pas les soins requis : délai d’attente très important, cote de triage minimisé et n’a pas les points de suture requis pour ses plaies d’automutilation.  Il s’agit d’un exemple de quoi? ",
       choices: ["Discrimination", "Introjection", "Contre-transfert"],
       answerIndex: 0,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_05",
-      stem: "Suicidaire refuse clinique mais accepte appel. Action ?",
-      choices: ["Refuser", "Consulter l'Ordre", "Accepter appel + obtenir contacts ressource"],
+      stem: "Jeune femme en ressource communautaire qui présente une détresse et idée suicidaires.  Refuse de venir nous voir en clinique externe, mais elle accepte d’avoir un RDV téléphonique avec nous.   Qu’est-ce qu’on fait? ",
+      choices: ["Refuser", "Consulter l'Ordre", "Accepter TV téléphonique + obtenir contacts ressource"],
       answerIndex: 2,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_06",
-      stem: "Itinérant suivi par équipe outreach. Action ?",
+      stem: "Patient qui vit dans la rue, peu intéressé à voir un suivi, mais une équipe de outreach va le voir.  Qu’est-ce qu’on fait? ",
       choices: ["Poursuivre outreach", "Laisser faire"],
       answerIndex: 0,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_07",
-      stem: "Psychotique stable avec 1000$ en poche. Action ?",
+      stem: "6.	Patient âgé dans la quarantaine qui présente un trouble psychotique paranoïde non-traité et qui ne veut pas de traitement. Garde 1000$ dans ses poches par sécurité. Actuellement stable et sans dangerosité.  Quelle est la meilleure conduite? ",
       choices: ["Bâtir alliance", "Interdire l'argent", "Hospitaliser"],
       answerIndex: 0,
       tags: ["2022", "éthique"]
@@ -245,7 +245,7 @@ window.QUIZ_BANKS["bank-legal"] = {
       id: "leg_2022_09",
       stem: "Principe CETM décisionnel ?",
       choices: ["Protection public", "État actuel", "Mesure la moins privative possible"],
-      answerIndex: 2,
+      answerIndex: 0,
       tags: ["2022", "légal"]
     },
     {
@@ -257,9 +257,9 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2022_11",
-      stem: "Ado 17 ans suicidaire stabilisée veut quitter. Action ?",
-      choices: ["Augmenter ISRS", "Garder contre son gré", "Libérer"],
-      answerIndex: 2,
+      stem: "10.	Patiente 17 ans sous ISRS avec une humeur qui fluctue avec possible épisodes d’hypomanie/manies dans le passé depuis 3 ans qui a fait des menaces suicidaires récentes.  Après une observation à l’urgence, elle reprend le contrôle et elle veut quitter.  Quel est votre prochaine étape",
+      choices: ["Augmenter ISRS", "Garder contre son gré", "Libérer", "Cesser son ISRS"],
+      answerIndex: 3,
       tags: ["2022", "légal"]
     },
     {
@@ -271,30 +271,30 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2022_13",
-      stem: "Signalements DPJ infondés répétitifs. Action ?",
+      stem: "12.	Femme avec TP qui suspecte que son ex-conjoint est violent avec les enfants.  Elle a elle-même fait plusieurs signalements et les enquêtes se sont toujours avérées négatives/infondées.  La femme ne veut pas qu’on rappelle la DPJ.  Vous faites quoi",
       choices: ["Rassurer", "Signaler", "Traiter manque de confiance"],
       answerIndex: 2,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_14",
-      stem: "ER intox + cellulite. Action ?",
+      stem: "Homme dans la 50aine qui a passé la nuit à l'urgence dans un contexte d'intoxication sévère à l'alcool et cellulite à la jambe. On discute du cas au transfert du matin en spécifiant que cet homme est habitué de dormir dehors et a hâte de quitter l'urgence. Quelle serait la meilleure conduite à tenir? ",
       choices: ["Équipe itinérante", "Éval psy", "ATB IV"],
       answerIndex: 0,
       tags: ["2022", "éthique"]
     },
     {
       id: "leg_2022_15",
-      stem: "80 ans dépense 1000$ produits naturels nièce. Action ?",
+      stem: "14.	Personne âgée (autour de 80 ans) qui consulte pour sx dépressifs. Il prend 25 comprimes de produits naturels vendus par sa nièce pour améliorer sa libido et donner plus d’énergie.  Il a dépensé 1000 dollars pour les acheter.  Quelle est la première chose que vous faites? ",
       choices: ["Pharmacien", "Diminuer Rx", "Dénoncer nièce pour abus"],
-      answerIndex: 2,
+      answerIndex: 0,
       tags: ["2022", "éthique"]
     },
 
     // ===================== 2021 =====================
     {
       id: "leg_2021_01",
-      stem: "Patient veut changer DX Narcissisme pour Invalidité. Convaincu du DX. Action ?",
+      stem: "un pt que vous avez vu à l’urgence pour des idées suicidaires post-rupture, vous lui faites un dx de trouble de personnalité narcissique. Plusieurs mois plus tard, il vous demande de changer votre dx car son med fam dit qu’il a un trouble d’adaptation et qu’il est en demande d’invalidité et que votre dx pourrait l’empecher d’accéder à ses prestations. Vous révisez votre dossier et vous êtes convaincu qu’il n’y a pas eu d’erreur. Que faites-vous ? ",
       choices: ["Discuter avec MD fam", "Informer des droits et ne pas changer", "Changer DX"],
       answerIndex: 1,
       tags: ["2021", "éthique"]
@@ -315,23 +315,23 @@ window.QUIZ_BANKS["bank-legal"] = {
     },
     {
       id: "leg_2021_04",
-      stem: "Aptitude : Schizo désorganisé croyait être invisible. Inapte car :",
+      stem: "Vous recevez un homme d’une trentaine d'années, schizophrène, pour une évaluation de l’aptitude à comparaître. Il dit ne pas vouloir d’avocat, car « ça coûte trop cher ». À l'entrevue, il ne se souvient pas des évènements et apparaît désorganisé. Il aurait dit au policier avoir été invisible durant le vol. Vous le voyez pour une aptitude à comparaître. Lequel des facteurs suivants le rend probablement inapte à subir son procès ? ",
       choices: ["Désorganisé", "Croyait être invisible"],
-      answerIndex: 1,
+      answerIndex: 0,
       tags: ["2021", "légal"]
     },
     {
       id: "leg_2021_05",
-      stem: "Suicide patient SIM. Action en premier ?",
+      stem: "Vous apprenez par le coroner qu’un patient du suivi intensif en communauté pas vu depuis quelques temps, qui ne prenait plus sa médication depuis plusieurs mois, s’est suicidé. Que faites-vous en premier? ",
       choices: ["Informer équipe + Debriefing", "Appeler famille", "Coroner"],
       answerIndex: 0,
       tags: ["2021", "éthique"]
     },
     {
       id: "leg_2021_06",
-      stem: "Schizo menace voisine, refuse appel. Action ensuite ?",
+      stem: "Patiente sous TAQ. Connue SCZ. Un membre de la famille (mère) vous appelle pour vous informer qu'elle ne prend plus ses Rx depuis quelques semaines et qu'elle est activement psychotique. Elle pense que la voisine veut l'empoisonnée et a l'intention de la tuer. Au dernier rendez-vous il y a deux mois elle était hostile, mais pas dangereuse. La patiente a refusé d’avoir un rendez-vous téléphonique avec vous ce jour. Vous aviser la police et l’équipe de suivi intensif dans le milieu pour retrouver la patiente, car on ignore où elle est. Étape la plus importante à faire ensuite?",
       choices: ["Appeler voisine", "Appeler CETM", "Remplir formulaire admission involontaire"],
-      answerIndex: 2,
+      answerIndex: 0,
       tags: ["2021", "légal"]
     },
     {
