@@ -1,14 +1,8 @@
-/**
- * Bank: Psychothérapie
- * Total questions: 73
- */
-
 window.QUIZ_BANKS = window.QUIZ_BANKS || {};
 
 window.QUIZ_BANKS["Psychothérapie (2021-2025)"] = {
   label: "Psychothérapie",
   questions: [
-  // --- ANNÉE 2025 ---
   {
     id: "psych_2025_1",
     year: "2025",
@@ -926,6 +920,7 @@ window.QUIZ_BANKS["Psychothérapie (2021-2025)"] = {
     tags: ["2021", "TCC", "Gériatrie"]
   }
 ];
+};
 
 // Nombre total de questions extraites par année :
 // 2025: 12 questions
