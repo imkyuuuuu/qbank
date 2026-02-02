@@ -27,6 +27,7 @@
 
     .filter-bar { margin: 20px 0; display: flex; gap: 10px; }
     select { padding: 12px; background: var(--card); color: white; border: 1px solid var(--border); border-radius: 8px; flex-grow: 1; font-size: 16px; cursor: pointer; }
+    option { background: var(--card); color: white; }
 
     /* Carte Question */
     .q-card { 
@@ -173,17 +174,21 @@
   // 3. Initialiser l'interface
   function initUI() {
     const selector = document.getElementById("bankSelector");
-    selector.innerHTML = '<option value="all">Toutes les banques</option>';
     
-    // Ajout des banques au menu déroulant
+    // Ajout de l'option spéciale "SIGNALEMENTS"
+    let options = '<option value="all">Toutes les banques</option>';
+    options += '<option value="reported" style="background:#3c1f1f; color:#e74c3c; font-weight:bold;">⚠️ Voir les Signalements</option>';
+    options += '<option disabled>------------------------</option>';
+    
+    // Ajout des banques
     Object.keys(banks).forEach(key => {
-      const opt = document.createElement("option");
-      opt.value = key;
-      opt.textContent = banks[key].label;
-      selector.appendChild(opt);
+      options += `<option value="${key}">${banks[key].label}</option>`;
     });
-
+    
+    selector.innerHTML = options;
     selector.addEventListener("change", () => renderQuestions(selector.value));
+    
+    // Afficher tout par défaut
     renderQuestions("all");
   }
 
@@ -194,17 +199,32 @@
 
     let questionsToShow = [];
     
-    // Filtrage
-    if (bankKey === "all") {
+    // --- LOGIQUE DE FILTRAGE ---
+    if (bankKey === "reported") {
+      // Cas spécial : On parcourt TOUT et on garde seulement ceux qui ont des signalements
+      Object.values(banks).forEach(b => {
+        b.questions.forEach(q => {
+          if (reportsMap[q.id] && reportsMap[q.id].length > 0) {
+            questionsToShow.push(q);
+          }
+        });
+      });
+      
+      if (questionsToShow.length === 0) {
+        list.innerHTML = "<div style='text-align:center; padding:40px; color:#aaa;'>Aucun signalement en cours. Tout va bien ! 🎉</div>";
+        return;
+      }
+
+    } else if (bankKey === "all") {
       Object.values(banks).forEach(b => questionsToShow.push(...b.questions));
     } else if (banks[bankKey]) {
       questionsToShow = banks[bankKey].questions;
     }
 
-    // Sécurité performance : limiter si trop de questions
-    if(questionsToShow.length > 600) {
+    // Sécurité performance (sauf si on filtre par signalement, on veut tout voir)
+    if(bankKey !== "reported" && questionsToShow.length > 600) {
         questionsToShow = questionsToShow.slice(0, 600);
-        console.warn("Affichage limité aux 600 premières questions pour la fluidité.");
+        console.warn("Affichage limité pour la performance.");
     }
 
     questionsToShow.forEach(q => {
@@ -249,7 +269,6 @@
       // Affichage des choix
       q.choices.forEach((choice, idx) => {
         const isSelected = (idx === currentIndex);
-        // Echappement des ID pour éviter les bugs JS
         const safeId = q.id.replace(/'/g, "\\'"); 
         
         html += `<div class="choice ${isSelected ? 'is-correct' : ''}" 
@@ -269,29 +288,24 @@
     if (!confirm("Voulez-vous définir cette réponse comme la nouvelle bonne réponse ?")) return;
 
     try {
-      // Enregistrement Firestore
       await setDoc(doc(db, "corrections", questionId), {
         answerIndex: newIndex,
         updatedAt: new Date().toISOString()
       });
 
-      // Mise à jour visuelle immédiate
       const parent = element.parentElement;
       parent.querySelectorAll('.choice').forEach(el => {
         el.classList.remove('is-correct');
-        // Retire le checkmark existant s'il y en a un
         if(el.lastElementChild && el.lastElementChild.tagName === "SPAN" && el.lastElementChild.innerText === "✅") {
             el.lastElementChild.remove();
         }
       });
       
       element.classList.add('is-correct');
-      // Ajout du checkmark
       const check = document.createElement("span");
       check.innerText = "✅";
       element.appendChild(check);
       
-      // Ajout du badge "Modifié" si pas déjà présent
       const headerDiv = element.closest('.q-card').querySelector('.q-header div');
       if(!headerDiv.querySelector('.badge-mod')) {
           const badge = document.createElement("span");
@@ -308,21 +322,19 @@
 
   // 6. Fonction globale : Supprimer un signalement
   window.deleteReport = async function(reportId, btnElement) {
-    if(!confirm("Avez-vous traité ce problème ? Voulez-vous supprimer ce signalement ?")) return;
+    if(!confirm("Supprimer ce signalement ?")) return;
     
     try {
       await deleteDoc(doc(db, "reports", reportId));
       
-      // Retirer la ligne visuellement
       const item = btnElement.parentElement;
       const box = item.parentElement;
       item.remove();
       
-      // Si c'était le dernier signalement, retirer la boite rouge et la bordure
       if(box.children.length === 0) {
           const card = box.closest('.q-card');
-          box.parentElement.remove(); // Retire la report-box
-          card.style.border = "1px solid var(--border)"; // Remet la bordure normale
+          box.parentElement.remove();
+          card.style.border = "1px solid var(--border)";
           const badge = card.querySelector('.badge-alert');
           if(badge) badge.remove();
       }
