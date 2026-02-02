@@ -4,44 +4,86 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Admin - Gestion des Réponses</title>
+  
   <script>
-    // Sécurité basique : on vérifie si connecté
     if (sessionStorage.getItem('auth_token') !== 'connected') {
       window.location.href = 'login.html';
     }
   </script>
+
   <style>
-    :root { --bg: #0b1021; --card: #161c33; --blue: #4dabf7; --text: #e9ecf5; --green: #2ecc71; --border: rgba(255,255,255,0.1); }
-    body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; }
-    
-    .filter-bar { margin-bottom: 20px; display: flex; gap: 10px; }
-    select { padding: 10px; background: var(--card); color: white; border: 1px solid var(--border); border-radius: 8px; flex-grow: 1;}
-
-    .q-card { background: var(--card); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; border-radius: 12px; }
-    .q-id { color: var(--blue); font-size: 12px; font-weight: bold; margin-bottom: 5px; }
-    .q-stem { font-weight: 600; margin-bottom: 15px; }
-    
-    .choice { 
-      padding: 10px; margin: 5px 0; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.2s; 
-      display: flex; justify-content: space-between; align-items: center;
+    /* --- THÈME DEEP NIGHT --- */
+    :root { 
+      --bg: #0b1021; --card: #161c33; 
+      --blue: #4dabf7; --text: #e9ecf5; 
+      --green: #2ecc71; --red: #e74c3c; --yellow: #f1c40f;
+      --border: rgba(255,255,255,0.1); 
     }
-    .choice:hover { background: rgba(255,255,255,0.05); }
     
-    /* Styles pour les états */
-    .is-correct { border-color: var(--green); background: rgba(46, 204, 113, 0.1); color: var(--green); font-weight: bold; }
-    .is-overridden { border-left: 4px solid #f1c40f; } /* Indicateur visuel qu'une correction est active */
+    body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    h1 { color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 15px; }
 
-    button.save-btn { background: var(--blue); color: #000; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 10px;}
+    .filter-bar { margin: 20px 0; display: flex; gap: 10px; }
+    select { padding: 12px; background: var(--card); color: white; border: 1px solid var(--border); border-radius: 8px; flex-grow: 1; font-size: 16px; cursor: pointer; }
+
+    /* Carte Question */
+    .q-card { 
+      background: var(--card); border: 1px solid var(--border); 
+      padding: 20px; margin-bottom: 20px; border-radius: 12px; 
+      position: relative;
+    }
+    
+    /* Indicateurs */
+    .q-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: bold; color: var(--blue); }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px; }
+    .badge-mod { background: rgba(241, 196, 15, 0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+    .badge-alert { background: rgba(231, 76, 60, 0.2); color: var(--red); border: 1px solid var(--red); }
+
+    .q-stem { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; line-height: 1.5; }
+    
+    /* Choix */
+    .choice { 
+      padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; 
+      cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;
+    }
+    .choice:hover { background: rgba(255,255,255,0.05); border-color: var(--blue); }
+    
+    /* États des choix */
+    .is-correct { border-color: var(--green); background: rgba(46, 204, 113, 0.15); color: var(--green); font-weight: bold; }
+    
+    /* Zone de signalement */
+    .report-box {
+      background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--red);
+      padding: 15px; margin-bottom: 15px; border-radius: 4px;
+    }
+    .report-item { 
+      display: flex; justify-content: space-between; align-items: flex-start; 
+      margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;
+    }
+    .btn-delete { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.7; }
+    .btn-delete:hover { opacity: 1; transform: scale(1.1); }
+
+    /* Bouton retour */
+    .btn-home {
+      display: inline-block; text-decoration: none; color: var(--text); 
+      background: var(--card); border: 1px solid var(--border); 
+      padding: 8px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🕵️‍♂️ Page Secrète - Modification des Réponses</h1>
+  <a href="index.html" class="btn-home">← Retour au Quiz</a>
+  
+  <h1>🕵️‍♂️ Console d'Administration</h1>
+  
   <div class="filter-bar">
-    <select id="bankSelector"><option value="">Chargement des banques...</option></select>
+    <select id="bankSelector"><option value="">Chargement...</option></select>
   </div>
+  
   <div id="questionsList"></div>
 </div>
 
@@ -73,40 +115,67 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 🔴 COLLEZ VOTRE CONFIGURATION FIREBASE ICI 🔴
+  // --- CONFIGURATION FIREBASE ---
   const firebaseConfig = {
-  apiKey: "AIzaSyAYVxT8Le90OB0XFfqxinI1bYnwWBMqAGY",
-  authDomain: "qbank-c06a6.firebaseapp.com",
-  projectId: "qbank-c06a6",
-  storageBucket: "qbank-c06a6.firebasestorage.app",
-  messagingSenderId: "872766547331",
-  appId: "1:872766547331:web:bd270985956702c99142b6",
-  measurementId: "G-KBMXFQ96HH"
+    apiKey: "AIzaSyAYVxT8Le90OB0XFfqxinI1bYnwWBMqAGY",
+    authDomain: "qbank-c06a6.firebaseapp.com",
+    projectId: "qbank-c06a6",
+    storageBucket: "qbank-c06a6.firebasestorage.app",
+    messagingSenderId: "872766547331",
+    appId: "1:872766547331:web:bd270985956702c99142b6",
+    measurementId: "G-KBMXFQ96HH"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Variables globales
+  // Variables
   const banks = window.QUIZ_BANKS || {};
-  let correctionsMap = {}; // Stocke les corrections chargées de Firebase
+  let correctionsMap = {};
+  let reportsMap = {};
 
-  // 1. Charger les corrections existantes au démarrage
-  async function loadCorrections() {
-    const snapshot = await getDocs(collection(db, "corrections"));
-    snapshot.forEach(doc => {
-      correctionsMap[doc.id] = doc.data().answerIndex;
-    });
+  // Démarrage
+  async function init() {
+    await Promise.all([loadCorrections(), loadReports()]);
     initUI();
   }
 
-  // 2. Initialiser l'interface
+  // 1. Charger les corrections (Réponses modifiées)
+  async function loadCorrections() {
+    try {
+      const snapshot = await getDocs(collection(db, "corrections"));
+      snapshot.forEach(doc => {
+        correctionsMap[doc.id] = doc.data().answerIndex;
+      });
+    } catch (e) { console.error("Erreur corrections:", e); }
+  }
+
+  // 2. Charger les signalements (Plaintes utilisateurs)
+  async function loadReports() {
+    try {
+      const snapshot = await getDocs(collection(db, "reports"));
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const qId = data.questionId;
+        
+        if (!reportsMap[qId]) reportsMap[qId] = [];
+        reportsMap[qId].push({ 
+          id: doc.id, 
+          reason: data.reason, 
+          date: data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : '?' 
+        });
+      });
+    } catch (e) { console.error("Erreur signalements:", e); }
+  }
+
+  // 3. Initialiser l'interface
   function initUI() {
     const selector = document.getElementById("bankSelector");
     selector.innerHTML = '<option value="all">Toutes les banques</option>';
     
+    // Ajout des banques au menu déroulant
     Object.keys(banks).forEach(key => {
       const opt = document.createElement("option");
       opt.value = key;
@@ -115,45 +184,78 @@
     });
 
     selector.addEventListener("change", () => renderQuestions(selector.value));
-    renderQuestions("all"); // Charger tout par défaut (ou la première)
+    renderQuestions("all");
   }
 
-  // 3. Afficher les questions
+  // 4. Afficher les questions
   function renderQuestions(bankKey) {
     const list = document.getElementById("questionsList");
     list.innerHTML = "";
 
     let questionsToShow = [];
+    
+    // Filtrage
     if (bankKey === "all") {
       Object.values(banks).forEach(b => questionsToShow.push(...b.questions));
     } else if (banks[bankKey]) {
       questionsToShow = banks[bankKey].questions;
     }
 
-    // Limiter l'affichage pour éviter de faire ramer le navigateur si trop de questions
-    // On affiche les 50 premières ou on ajoute une pagination simple si besoin
-    // Pour l'instant, on affiche tout mais attention à la performance.
-    
+    // Sécurité performance : limiter si trop de questions
+    if(questionsToShow.length > 600) {
+        questionsToShow = questionsToShow.slice(0, 600);
+        console.warn("Affichage limité aux 600 premières questions pour la fluidité.");
+    }
+
     questionsToShow.forEach(q => {
       const card = document.createElement("div");
       card.className = "q-card";
       
-      // Vérifier si une correction existe
+      // État de la question
       const savedIndex = correctionsMap[q.id];
       const currentIndex = (savedIndex !== undefined) ? savedIndex : q.answerIndex;
-      const isModified = (savedIndex !== undefined && savedIndex !== q.answerIndex); // Visuel si modifié
+      const isModified = (savedIndex !== undefined && savedIndex !== q.answerIndex);
+      
+      const reports = reportsMap[q.id];
+      const hasReports = reports && reports.length > 0;
 
-      if (isModified) card.classList.add("is-overridden");
+      // Style spécial si signalée
+      if (hasReports) card.style.border = "2px solid #e74c3c";
 
-      let html = `<div class="q-id">ID: ${q.id} ${isModified ? '✏️ MODIFIÉ' : ''}</div>
+      // En-tête de la carte
+      let html = `<div class="q-header">
+                    <span>ID: ${q.id}</span>
+                    <div>
+                        ${isModified ? '<span class="badge badge-mod">✏️ MODIFIÉ</span>' : ''}
+                        ${hasReports ? `<span class="badge badge-alert">⚠️ ${reports.length} SIGNALEMENT(S)</span>` : ''}
+                    </div>
+                  </div>
                   <div class="q-stem">${q.stem}</div>`;
 
+      // Affichage des plaintes
+      if (hasReports) {
+        html += `<div class="report-box">
+                   <strong style="color:var(--red)">Plaintes utilisateurs :</strong>
+                   <div style="margin-top:10px">`;
+        reports.forEach(r => {
+          html += `<div class="report-item">
+                     <span>"${r.reason}" <em style="opacity:0.6; font-size:0.8em">(${r.date})</em></span>
+                     <button onclick="window.deleteReport('${r.id}', this)" class="btn-delete" title="Supprimer le signalement">🗑️</button>
+                   </div>`;
+        });
+        html += `</div></div>`;
+      }
+
+      // Affichage des choix
       q.choices.forEach((choice, idx) => {
         const isSelected = (idx === currentIndex);
+        // Echappement des ID pour éviter les bugs JS
+        const safeId = q.id.replace(/'/g, "\\'"); 
+        
         html += `<div class="choice ${isSelected ? 'is-correct' : ''}" 
-                      onclick="updateAnswer('${q.id}', ${idx}, this)">
-                   ${String.fromCharCode(65+idx)}. ${choice}
-                   ${isSelected ? '✅' : ''}
+                      onclick="window.updateAnswer('${safeId}', ${idx}, this)">
+                   <span>${String.fromCharCode(65+idx)}. ${choice}</span>
+                   ${isSelected ? '<span>✅</span>' : ''}
                  </div>`;
       });
 
@@ -162,13 +264,12 @@
     });
   }
 
-  // 4. Fonction pour sauvegarder le changement (Globale)
+  // 5. Fonction globale : Sauvegarder une correction
   window.updateAnswer = async function(questionId, newIndex, element) {
     if (!confirm("Voulez-vous définir cette réponse comme la nouvelle bonne réponse ?")) return;
 
     try {
-      // Sauvegarder dans Firestore collection "corrections"
-      // ID du document = ID de la question
+      // Enregistrement Firestore
       await setDoc(doc(db, "corrections", questionId), {
         answerIndex: newIndex,
         updatedAt: new Date().toISOString()
@@ -176,26 +277,63 @@
 
       // Mise à jour visuelle immédiate
       const parent = element.parentElement;
-      // Retirer le style correct des autres
       parent.querySelectorAll('.choice').forEach(el => {
         el.classList.remove('is-correct');
-        el.innerHTML = el.innerHTML.replace('✅', '');
+        // Retire le checkmark existant s'il y en a un
+        if(el.lastElementChild && el.lastElementChild.tagName === "SPAN" && el.lastElementChild.innerText === "✅") {
+            el.lastElementChild.remove();
+        }
       });
-      // Ajouter au nouveau
+      
       element.classList.add('is-correct');
-      element.innerHTML += ' ✅';
+      // Ajout du checkmark
+      const check = document.createElement("span");
+      check.innerText = "✅";
+      element.appendChild(check);
       
-      alert("Correction sauvegardée ! Elle sera active pour tous les utilisateurs.");
-      
+      // Ajout du badge "Modifié" si pas déjà présent
+      const headerDiv = element.closest('.q-card').querySelector('.q-header div');
+      if(!headerDiv.querySelector('.badge-mod')) {
+          const badge = document.createElement("span");
+          badge.className = "badge badge-mod";
+          badge.innerText = "✏️ MODIFIÉ";
+          headerDiv.prepend(badge);
+      }
+
     } catch (e) {
       console.error(e);
-      alert("Erreur lors de la sauvegarde.");
+      alert("Erreur lors de la sauvegarde : " + e.message);
     }
   };
 
-  // Démarrage
-  loadCorrections();
+  // 6. Fonction globale : Supprimer un signalement
+  window.deleteReport = async function(reportId, btnElement) {
+    if(!confirm("Avez-vous traité ce problème ? Voulez-vous supprimer ce signalement ?")) return;
+    
+    try {
+      await deleteDoc(doc(db, "reports", reportId));
+      
+      // Retirer la ligne visuellement
+      const item = btnElement.parentElement;
+      const box = item.parentElement;
+      item.remove();
+      
+      // Si c'était le dernier signalement, retirer la boite rouge et la bordure
+      if(box.children.length === 0) {
+          const card = box.closest('.q-card');
+          box.parentElement.remove(); // Retire la report-box
+          card.style.border = "1px solid var(--border)"; // Remet la bordure normale
+          const badge = card.querySelector('.badge-alert');
+          if(badge) badge.remove();
+      }
+      
+    } catch(e) { 
+        console.error(e); 
+        alert("Erreur suppression.");
+    }
+  };
 
+  init();
 </script>
 </body>
 </html>
