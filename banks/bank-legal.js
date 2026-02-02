@@ -6,7 +6,7 @@ window.QUIZ_BANKS["bank-legal"] = {
     // ===================== 2025 =====================
     {
       id: "leg_2025_01",
-      stem: "Femme post-partum 4 sem, ATCD de tentative de suicide grave. Stressée, ne dort pas, veut quitter. Mari injoignable. Quelle est la conduite ?",
+      stem: "84.	Femme post-partum 4 sem. A déjà consulté l’urgence il y a 2 ans, avait été amenée par son mari car elle voulait se pendre dans le garage (avait eu congé avec sertraline pour EDC). Sertraline cessée x 1 an (avait répondu). Mari l’amène à l’urgence aujourd’hui car très inquiet, a dû quitter car doit s’occuper du bébé. Pas de famille en ville. Pte a coupé contact avec ses parents depuis plusieurs années. En entrevue, pte collabore mais « sur ses gardes ». Pte se dit stressée et ne dort pas bien, elle ne veut pas rester à l’hôpital. Impossible de rejoindre mari. On fait quoi? ",
       choices: ["Hospit contre son gré en attendant de parler au mari", "Demander consentement pour appeler sa mère", "Congé avec sertraline", "Congé avec référence externe"],
       answerIndex: 0,
       tags: ["2025", "légal"]
