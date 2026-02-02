@@ -2,6 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8"/>
+  <script>
+    // Vérification de sécurité
+    if (sessionStorage.getItem('auth_token') !== 'connected') {
+      window.location.href = 'login.html';
+    }
+  </script>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Quiz Psychiatrie – Mode Nuit</title>
   <style>
