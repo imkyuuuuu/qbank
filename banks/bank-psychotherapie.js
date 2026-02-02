@@ -5,7 +5,9 @@
 
 window.QUIZ_BANKS = window.QUIZ_BANKS || {};
 
-window.QUIZ_BANKS['psychotherapie'] = [
+window.QUIZ_BANKS["Psychothérapie (2021-2025)"] = {
+  label: "Psychothérapie",
+  questions: [
   // --- ANNÉE 2025 ---
   {
     id: "psych_2025_1",
