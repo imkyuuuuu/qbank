@@ -2,16 +2,18 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8"/>
+  
   <script>
-    // Vérification de sécurité
     if (sessionStorage.getItem('auth_token') !== 'connected') {
       window.location.href = 'login.html';
     }
   </script>
+
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Quiz Psychiatrie – Mode Nuit</title>
+  
   <style>
-    /* Thème Deep Night */ 
+    /* --- THÈME DEEP NIGHT --- */
     :root {
       --bg-color: #0b1021;
       --card-bg: #161c33;
@@ -32,25 +34,31 @@
       display: flex;
       justify-content: center;
       padding: 24px;
+      min-height: 100vh;
     }
 
-    .wrap { width: min(900px, 100%); }
+    .wrap { width: min(900px, 100%); position: relative; }
 
+    /* Cartes Principales */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
     }
 
+    /* En-têtes */
     h1 {
       margin: 0 0 16px 0;
       font-size: 20px;
       color: var(--primary-blue);
       letter-spacing: 0.5px;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
+    /* Grille des Banques */
     .banks {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -77,6 +85,7 @@
 
     .muted { color: var(--text-muted); font-size: 13px; }
 
+    /* Boutons Généraux */
     button {
       border: 1px solid var(--primary-blue);
       background: var(--primary-blue);
@@ -94,6 +103,11 @@
 
     #clearBtn { background: transparent; color: var(--text-main); border-color: var(--border-color); }
     #selectAllBtn { background: var(--accent-blue); color: var(--primary-blue); border-color: var(--primary-blue); }
+    
+    /* Bouton Déconnexion */
+    #logoutBtn {
+        font-size: 12px; padding: 6px 12px; background: transparent; border: 1px solid var(--error); color: var(--error);
+    }
 
     .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
 
@@ -107,6 +121,7 @@
       font-weight: 600;
     }
 
+    /* Style du Quiz */
     #questionText {
       font-size: 22px;
       font-weight: 700;
@@ -123,28 +138,77 @@
       margin-bottom: 8px;
       display: block;
       width: 100%;
-      padding: 12px;
+      padding: 16px;
       border-radius: 8px;
       cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
     }
 
     #choices button:hover:not(:disabled) {
       background: var(--accent-blue);
       border-color: var(--primary-blue);
     }
+
+    /* --- Style du Modal de Signalement --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-card {
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      padding: 24px; border-radius: 16px; width: 90%; max-width: 400px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .modal-card h2 { margin-top: 0; color: var(--primary-blue); font-size: 18px; }
+
+    textarea {
+      width: 100%; height: 100px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-color); border-radius: 8px;
+      color: var(--text-main); padding: 10px; margin: 15px 0;
+      font-family: inherit; resize: vertical; box-sizing: border-box;
+    }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+    .btn-cancel { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+    .btn-submit { background: var(--error); border: 1px solid var(--error); color: white; }
+
   </style>
 </head>
 <body>
+  
+  <div id="reportModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2>Signaler une erreur</h2>
+      <p class="muted" id="reportContext">Question ID: ...</p>
+      <textarea id="reportReason" placeholder="Décrivez l'erreur (ex: La réponse B est fausse car...)" required></textarea>
+      <div class="modal-actions">
+        <button id="cancelReportBtn" class="btn-cancel">Annuler</button>
+        <button id="submitReportBtn" class="btn-submit">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
   <main class="wrap">
     
     <section class="card" id="selectionCard">
-      <h1>Sources d'études</h1>
+      <h1>
+        Sources d'études
+        <button id="logoutBtn" onclick="sessionStorage.removeItem('auth_token'); location.reload();">Déconnexion</button>
+      </h1>
+      
       <div class="row">
         <div class="pill" id="totalPill">Total sélectionné: 0 question</div>
-        <div class="pill muted">Sélectionnez vos banques de questions</div>
+        <div class="pill muted">Cochez les banques</div>
       </div>
 
-      <div class="banks" id="banksList"></div>
+      <div class="banks" id="banksList">
+        </div>
 
       <div class="row" style="margin-top:32px; padding-top: 20px; border-top: 1px solid var(--border-color);">
         <div style="display:flex; gap:10px">
@@ -165,8 +229,15 @@
       
       <div id="choices"></div>
 
-      <div class="row" style="margin-top:24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-        <div id="feedbackText" style="color: var(--primary-blue); font-weight: 700;">En attente de réponse...</div>
+      <div class="row" style="margin-top:24px; padding-top: 16px; border-top: 1px solid var(--border-color); align-items: center;">
+        
+        <div id="feedbackText" style="color: var(--primary-blue); font-weight: 700; flex-grow: 1;">En attente...</div>
+        
+        <button id="openReportBtn" type="button" 
+                style="background: transparent; border: 1px solid var(--error); color: var(--error); margin-right: 10px; font-size: 13px; padding: 8px 12px;">
+          🚩 Signaler
+        </button>
+
         <div style="display:flex; gap:10px">
           <button id="backHomeBtn" type="button" style="background:transparent; color:var(--text-muted); border-color:var(--border-color);">Quitter</button>
           <button id="nextBtn" type="button" disabled>Suivant</button>
@@ -180,7 +251,6 @@
     <script src="./banks/bank-2023.js"></script>
     <script src="./banks/bank-2024.js"></script>
     <script src="./banks/bank-2025.js"></script>
-    <script src="./banks/bank-cope2025.js"></script>
     <script src="./banks/bank-CL.js"></script>
     <script src="./banks/bank-TP.js"></script>
     <script src="./banks/bank-TUS.js"></script>
@@ -200,9 +270,7 @@
     <script src="./banks/bank-sommeil.js"></script>
     <script src="./banks/bank-usa6.js"></script>
     <script src="./banks/bank-usa5.js"></script>
-    
-    <script type="module" src="./app.js"></script>
-
+    <script src="./banks/bank-cope-2025.js"></script> <script type="module" src="./app.js"></script>
   </main>
 </body>
 </html>
