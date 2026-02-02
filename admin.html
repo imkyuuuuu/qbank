@@ -3,480 +3,652 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin - Connexion Requise</title>
-  
-  <style>
-    /* --- THÈME DEEP NIGHT --- */
-    :root { 
-      --bg: #0b1021; --card: #161c33; 
-      --blue: #4dabf7; --text: #e9ecf5; 
-      --green: #2ecc71; --red: #e74c3c; --yellow: #f1c40f;
-      --border: rgba(255,255,255,0.1); 
-    }
-    
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
-    .container { max-width: 900px; margin: 0 auto; }
+  <title>Admin - Console</title>
 
-    /* --- ÉCRAN DE LOGIN --- */
+  <style>
+    :root {
+      --bg: #0b1021; --card: #161c33;
+      --blue: #4dabf7; --text: #e9ecf5;
+      --green: #2ecc71; --red: #e74c3c; --yellow: #f1c40f;
+      --border: rgba(255,255,255,0.1);
+      --muted: rgba(233,236,245,0.7);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+    .container { max-width: 980px; margin: 0 auto; }
+
+    /* LOGIN */
     #login-screen {
       height: 100vh; display: flex; justify-content: center; align-items: center;
       position: fixed; top: 0; left: 0; width: 100%; background: var(--bg); z-index: 1000;
     }
     .login-box {
-      background: var(--card); padding: 40px; border-radius: 16px; 
-      border: 1px solid var(--border); width: 300px; text-align: center;
+      background: var(--card); padding: 40px; border-radius: 16px;
+      border: 1px solid var(--border); width: 320px; text-align: center;
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
     input {
       width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.2);
       border: 1px solid var(--border); border-radius: 8px; color: white; box-sizing: border-box;
     }
-    .btn-login {
-      width: 100%; padding: 12px; background: var(--blue); color: #000; border: none;
-      border-radius: 8px; font-weight: bold; cursor: pointer;
+    .btn { cursor: pointer; border-radius: 8px; border: 1px solid transparent; font-weight: 800; }
+    .btn-primary { width: 100%; padding: 12px; background: var(--blue); color: #000; }
+    .btn-primary:hover { opacity: 0.9; }
+    #login-error { color: var(--red); margin-top: 10px; font-size: 13px; display: none; }
+
+    /* ADMIN */
+    #admin-ui { display: none; }
+    h1 { color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-top: 10px; }
+
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap: 10px; }
+    .btn-logout { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .btn-home { text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 14px; display: inline-block;}
+    .btn-logout:hover, .btn-home:hover { opacity: 0.9; }
+
+    .panel {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; margin-top: 16px;
     }
-    .btn-login:hover { opacity: 0.9; }
+    .panel h2 { margin: 0 0 8px 0; color: var(--text); font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.4; }
 
-    /* --- UI ADMIN --- */
-    #admin-ui { display: none; } /* Caché par défaut */
-    
-    h1 { color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .actions { display:flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .btn-warn { background: rgba(241,196,15,0.15); color: var(--yellow); border: 1px solid rgba(241,196,15,0.55); padding: 10px 12px; }
+    .btn-warn:hover { background: rgba(241,196,15,0.22); }
+    .btn-danger { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.55); padding: 10px 12px; }
+    .btn-danger:hover { background: rgba(231,76,60,0.22); }
+    .btn-soft { background: rgba(255,255,255,0.06); color: var(--text); border: 1px solid var(--border); padding: 10px 12px; }
+    .btn-soft:hover { background: rgba(255,255,255,0.09); }
 
-    .filter-bar { margin: 20px 0; display: flex; gap: 10px; }
-    select { padding: 12px; background: var(--card); color: white; border: 1px solid var(--border); border-radius: 8px; flex-grow: 1; font-size: 16px; cursor: pointer; }
+    .progress {
+      margin-top: 10px; font-size: 13px; color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .filter-bar { margin: 16px 0; display: flex; gap: 10px; }
+    select {
+      padding: 12px; background: var(--card); color: white; border: 1px solid var(--border);
+      border-radius: 8px; flex-grow: 1; font-size: 16px; cursor: pointer;
+    }
     option { background: var(--card); color: white; }
 
-    /* Carte Question */
-    .q-card { 
-      background: var(--card); border: 1px solid var(--border); 
-      padding: 20px; margin-bottom: 20px; border-radius: 12px; 
+    /* Q Cards */
+    .q-card {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 18px; margin-bottom: 16px; border-radius: 12px;
       position: relative;
     }
-    
-    .q-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; font-weight: bold; color: var(--blue); }
-    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 10px; }
-    .badge-mod { background: rgba(241, 196, 15, 0.2); color: var(--yellow); border: 1px solid var(--yellow); }
-    .badge-alert { background: rgba(231, 76, 60, 0.2); color: var(--red); border: 1px solid var(--red); }
+    .q-header { display:flex; justify-content:space-between; gap: 10px; margin-bottom: 10px; font-size: 12px; font-weight: bold; color: var(--blue); }
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; margin-left: 8px; border: 1px solid transparent; }
+    .badge-mod { background: rgba(241,196,15,0.2); color: var(--yellow); border-color: rgba(241,196,15,0.55); }
+    .badge-alert { background: rgba(231,76,60,0.2); color: var(--red); border-color: rgba(231,76,60,0.55); }
+    .q-stem { font-weight: 700; font-size: 1.05em; margin-bottom: 14px; line-height: 1.45; }
 
-    .q-stem { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; line-height: 1.5; }
-    
-    /* Choix */
-    .choice { 
-      padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; 
+    .choice {
+      padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 10px;
       cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
-      display: flex; justify-content: space-between; align-items: center; z-index: 1;
+      display:flex; justify-content:space-between; align-items:center;
     }
     .choice:hover { border-color: var(--blue); }
-    .choice span { position: relative; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-    .stat-bar {
-      position: absolute; top: 0; left: 0; height: 100%;
-      background: rgba(255, 255, 255, 0.08); z-index: 0; transition: width 0.5s ease;
-    }
+    .choice span { position: relative; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.7); }
+    .stat-bar { position:absolute; top:0; left:0; height:100%; background: rgba(255,255,255,0.08); z-index:0; transition: width 0.4s ease; }
     .is-correct { border-color: var(--green); }
-    .is-correct .stat-bar { background: rgba(46, 204, 113, 0.2); }
-    .stat-percent { font-size: 0.85em; color: var(--text); opacity: 0.7; margin-left: 10px; min-width: 40px; text-align: right; }
+    .is-correct .stat-bar { background: rgba(46,204,113,0.2); }
+    .stat-percent { font-size: 0.85em; color: var(--text); opacity: 0.7; margin-left: 10px; min-width: 44px; text-align: right; }
 
-    /* Signalement */
-    .report-box { background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--red); padding: 15px; margin-bottom: 15px; border-radius: 4px; }
-    .report-item { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-    .btn-delete { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.7; }
-    .btn-delete:hover { opacity: 1; transform: scale(1.1); }
+    .report-box { background: rgba(231, 76, 60, 0.1); border-left: 4px solid var(--red); padding: 14px; margin-bottom: 14px; border-radius: 8px; }
+    .report-item { display:flex; justify-content:space-between; align-items:flex-start; gap: 10px; margin-bottom: 8px; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px; }
+    .btn-delete { background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.75; }
+    .btn-delete:hover { opacity: 1; transform: scale(1.05); }
 
-    .btn-logout { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
-    .btn-home { text-decoration: none; color: var(--text); background: var(--card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; display: inline-block;}
-    
-    #login-error { color: var(--red); margin-top: 10px; font-size: 13px; display: none; }
+    .hr { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 0; }
   </style>
 </head>
+
 <body>
-
-<div id="login-screen">
-  <div class="login-box">
-    <h2 style="margin-top:0; color:var(--blue)">Admin Login</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="Email Admin" required>
-      <input type="password" id="password" placeholder="Mot de passe" required>
-      <button type="submit" class="btn-login" id="loginBtn">Se connecter</button>
-      <div id="login-error">Erreur d'authentification</div>
-    </form>
-    <a href="index.html" style="color:var(--text); font-size:12px; display:block; margin-top:20px;">Retour au site</a>
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h2 style="margin-top:0; color:var(--blue)">Admin Login</h2>
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Email Admin" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button type="submit" class="btn btn-primary" id="loginBtn">Se connecter</button>
+        <div id="login-error">Erreur d'authentification</div>
+      </form>
+      <a href="index.html" style="color:var(--text); font-size:12px; display:block; margin-top:20px;">Retour au site</a>
+    </div>
   </div>
-</div>
 
-<div id="admin-ui" class="container">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <a href="index.html" class="btn-home">← Retour au Quiz</a>
-    <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+  <!-- ADMIN UI -->
+  <div id="admin-ui" class="container">
+    <div class="topbar">
+      <a href="index.html" class="btn-home">← Retour au Quiz</a>
+      <button id="logoutBtn" class="btn-logout">Déconnexion</button>
+    </div>
+
+    <h1>🕵️‍♂️ Console d'Administration</h1>
+
+    <!-- MIGRATION PANEL -->
+    <div class="panel">
+      <h2>Corrections — Migration vers “correctionsByBank”</h2>
+      <div class="muted">
+        Objectif: arrêter de lire/écrire la collection <b>corrections</b> (1 doc par question) et migrer vers
+        <b>correctionsByBank/{bankKey}</b> (1 doc par banque) avec un champ <b>answers</b> (map {questionId: answerIndex}).
+        <div class="hr"></div>
+        <b>À utiliser 1 seule fois</b> si tu as déjà des corrections existantes dans l’ancien modèle.
+      </div>
+      <div class="actions">
+        <button id="migrateBtn" class="btn btn-warn">🚚 Migrer corrections → correctionsByBank</button>
+        <button id="migrateDryBtn" class="btn btn-soft">🔎 Dry-run (sans écrire)</button>
+        <button id="clearBankCacheBtn" class="btn btn-danger">🧹 Vider cache local (admin)</button>
+      </div>
+      <div id="migrationLog" class="progress"></div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <select id="bankSelector"><option value="">Chargement...</option></select>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div id="questionsList"></div>
   </div>
-  
-  <h1>
-    🕵️‍♂️ Console d'Administration
-  </h1>
-  
-  <div class="filter-bar">
-    <select id="bankSelector"><option value="">Chargement...</option></select>
-  </div>
-  
-  <div id="questionsList"></div>
-</div>
 
-<script src="./banks/bank-2021.js"></script>
-<script src="./banks/bank-2022.js"></script>
-<script src="./banks/bank-2023.js"></script>
-<script src="./banks/bank-2024.js"></script>
-<script src="./banks/bank-2025.js"></script>
-<script src="./banks/bank-CL.js"></script>
-<script src="./banks/bank-TP.js"></script>
-<script src="./banks/bank-TUS.js"></script>
-<script src="./banks/bank-alimentaire.js"></script>
-<script src="./banks/bank-anxiete.js"></script>
-<script src="./banks/bank-cope.js"></script>
-<script src="./banks/bank-depression.js"></script>
-<script src="./banks/bank-epidemio.js"></script>
-<script src="./banks/bank-geronto.js"></script>
-<script src="./banks/bank-legal.js"></script>
-<script src="./banks/bank-mab.js"></script>
-<script src="./banks/bank-pedopsy.js"></script>
-<script src="./banks/bank-perinat.js"></script>
-<script src="./banks/bank-pharmatothx.js"></script>
-<script src="./banks/bank-psychose.js"></script>
-<script src="./banks/bank-psychotherapie.js"></script>
-<script src="./banks/bank-sommeil.js"></script>
-<script src="./banks/bank-usa6.js"></script>
-<script src="./banks/bank-usa5.js"></script>
-<script src="./banks/bank-cope2025.js"></script>
+  <!-- BANK SCRIPTS -->
+  <script src="./banks/bank-2021.js"></script>
+  <script src="./banks/bank-2022.js"></script>
+  <script src="./banks/bank-2023.js"></script>
+  <script src="./banks/bank-2024.js"></script>
+  <script src="./banks/bank-2025.js"></script>
+  <script src="./banks/bank-CL.js"></script>
+  <script src="./banks/bank-TP.js"></script>
+  <script src="./banks/bank-TUS.js"></script>
+  <script src="./banks/bank-alimentaire.js"></script>
+  <script src="./banks/bank-anxiete.js"></script>
+  <script src="./banks/bank-cope.js"></script>
+  <script src="./banks/bank-depression.js"></script>
+  <script src="./banks/bank-epidemio.js"></script>
+  <script src="./banks/bank-geronto.js"></script>
+  <script src="./banks/bank-legal.js"></script>
+  <script src="./banks/bank-mab.js"></script>
+  <script src="./banks/bank-pedopsy.js"></script>
+  <script src="./banks/bank-perinat.js"></script>
+  <script src="./banks/bank-pharmatothx.js"></script>
+  <script src="./banks/bank-psychose.js"></script>
+  <script src="./banks/bank-psychotherapie.js"></script>
+  <script src="./banks/bank-sommeil.js"></script>
+  <script src="./banks/bank-usa6.js"></script>
+  <script src="./banks/bank-usa5.js"></script>
+  <script src="./banks/bank-cope2025.js"></script>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { 
-    getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, serverTimestamp 
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      getDocs,
+      collection,
+      deleteDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // --- CONFIGURATION FIREBASE ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyAYVxT8Le90OB0XFfqxinI1bYnwWBMqAGY",
-    authDomain: "qbank-c06a6.firebaseapp.com",
-    projectId: "qbank-c06a6",
-    storageBucket: "qbank-c06a6.firebasestorage.app",
-    messagingSenderId: "872766547331",
-    appId: "1:872766547331:web:bd270985956702c99142b6",
-    measurementId: "G-KBMXFQ96HH"
-  };
+    // --- CONFIG FIREBASE ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAYVxT8Le90OB0XFfqxinI1bYnwWBMqAGY",
+      authDomain: "qbank-c06a6.firebaseapp.com",
+      projectId: "qbank-c06a6",
+      storageBucket: "qbank-c06a6.firebasestorage.app",
+      messagingSenderId: "872766547331",
+      appId: "1:872766547331:web:bd270985956702c99142b6",
+      measurementId: "G-KBMXFQ96HH"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // --- DATA ---
-  const banks = window.QUIZ_BANKS || {};
+    // --- DATA ---
+    const banks = window.QUIZ_BANKS || {};
+    const bankKeys = Object.keys(banks);
 
-  // reports/stats restent comme avant (lecture globale) — on optimisera ensuite si tu veux
-  let reportsMap = {};
-  let statsMap = {};
-  let dataLoaded = false;
+    // maps
+    const questionById = {};         // { [qId]: questionObj }
+    const bankCorrectionsCache = {}; // { [bankKey]: { loaded:true, answers:{...} } }
+    let reportsMap = {};
+    let statsMap = {};
+    let dataLoaded = false;
 
-  // --- CORRECTIONS BY BANK ---
-  // Structure en DB: correctionsByBank/{bankKey} => { updatedAt: Timestamp, answers: { [qId]: number } }
-  const bankCorrectionsCache = {}; // { [bankKey]: { answers: {...}, loaded: true } }
+    // --- UI ELEMENTS ---
+    const loginScreen = document.getElementById('login-screen');
+    const adminUi = document.getElementById('admin-ui');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('login-error');
+    const bankSelector = document.getElementById("bankSelector");
+    const migrationLog = document.getElementById("migrationLog");
+    const migrateBtn = document.getElementById("migrateBtn");
+    const migrateDryBtn = document.getElementById("migrateDryBtn");
+    const clearBankCacheBtn = document.getElementById("clearBankCacheBtn");
 
-  // Map rapide questionId -> objet question (pour retrouver bankKey, etc.)
-  const questionById = {};
+    function logLine(s) {
+      migrationLog.textContent += (migrationLog.textContent ? "\n" : "") + s;
+    }
+    function setBusy(btn, busy, labelBusy, labelIdle) {
+      btn.disabled = busy;
+      btn.textContent = busy ? labelBusy : labelIdle;
+    }
+    function resetLog() {
+      migrationLog.textContent = "";
+    }
 
-  function indexQuestions() {
-    Object.keys(banks).forEach((bankKey) => {
-      const bank = banks[bankKey];
-      if (!bank || !Array.isArray(bank.questions)) return;
+    // --- INDEX QUESTIONS ---
+    function indexQuestions() {
+      for (const bk of bankKeys) {
+        const bank = banks[bk];
+        if (!bank || !Array.isArray(bank.questions)) continue;
+        for (const q of bank.questions) {
+          if (!q || !q.id) continue;
+          q._bankKey = bk;
+          questionById[q.id] = q;
+        }
+      }
+    }
 
-      bank.questions.forEach((q) => {
-        // On garde une référence
-        q._bankKey = bankKey;
-        questionById[q.id] = q;
-      });
-    });
-  }
+    // --- CORRECTIONS BY BANK (LOAD) ---
+    async function ensureCorrectionsLoaded(bankKey) {
+      if (!bankKey) return;
+      if (bankCorrectionsCache[bankKey]?.loaded) return;
 
-  async function ensureCorrectionsLoaded(bankKey) {
-    if (!bankKey) return;
-    if (bankCorrectionsCache[bankKey]?.loaded) return;
+      bankCorrectionsCache[bankKey] = bankCorrectionsCache[bankKey] || { answers: {}, loaded: true };
 
-    // Marque "loaded" tout de suite pour éviter double fetch concurrent
-    bankCorrectionsCache[bankKey] = bankCorrectionsCache[bankKey] || { answers: {}, loaded: true };
-
-    try {
-      const ref = doc(db, "correctionsByBank", bankKey);
-      const snap = await getDoc(ref);
-
-      if (snap.exists()) {
-        const data = snap.data();
-        const answers = (data && typeof data.answers === "object" && data.answers) ? data.answers : {};
-        bankCorrectionsCache[bankKey].answers = answers;
-      } else {
+      try {
+        const ref = doc(db, "correctionsByBank", bankKey);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data() || {};
+          const answers = (data.answers && typeof data.answers === "object") ? data.answers : {};
+          bankCorrectionsCache[bankKey].answers = answers;
+        } else {
+          bankCorrectionsCache[bankKey].answers = {};
+        }
+      } catch (e) {
+        console.error("Erreur chargement correctionsByBank:", bankKey, e);
         bankCorrectionsCache[bankKey].answers = {};
       }
-    } catch (e) {
-      console.error("Erreur chargement correctionsByBank:", bankKey, e);
-      bankCorrectionsCache[bankKey].answers = {};
     }
-  }
 
-  function getSavedAnswerIndex(q) {
-    if (!q || !q._bankKey) return undefined;
-    const bankKey = q._bankKey;
-    const answers = bankCorrectionsCache[bankKey]?.answers;
-    if (!answers) return undefined;
-    const v = answers[q.id];
-    return (v === undefined) ? undefined : v;
-  }
-
-  // --- GESTION AUTHENTIFICATION ---
-  const loginScreen = document.getElementById('login-screen');
-  const adminUi = document.getElementById('admin-ui');
-  const loginForm = document.getElementById('loginForm');
-  const loginError = document.getElementById('login-error');
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      loginScreen.style.display = 'none';
-      adminUi.style.display = 'block';
-      if (!dataLoaded) initData();
-    } else {
-      loginScreen.style.display = 'flex';
-      adminUi.style.display = 'none';
-      dataLoaded = false;
+    function getSavedAnswerIndex(q) {
+      if (!q || !q._bankKey) return undefined;
+      const answers = bankCorrectionsCache[q._bankKey]?.answers;
+      if (!answers) return undefined;
+      const v = answers[q.id];
+      return (v === undefined) ? undefined : v;
     }
-  });
 
-  // Login
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const btn = document.getElementById('loginBtn');
-    
-    btn.innerText = "Connexion...";
-    loginError.style.display = 'none';
+    // --- AUTH ---
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginScreen.style.display = 'none';
+        adminUi.style.display = 'block';
+        if (!dataLoaded) initData();
+      } else {
+        loginScreen.style.display = 'flex';
+        adminUi.style.display = 'none';
+        dataLoaded = false;
+      }
+    });
 
-    signInWithEmailAndPassword(auth, email, password)
-      .catch((error) => {
-        console.error(error);
-        loginError.style.display = 'block';
-        loginError.innerText = "Email ou mot de passe incorrect.";
-      })
-      .finally(() => {
-        btn.innerText = "Se connecter";
-      });
-  });
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('loginBtn');
 
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-    signOut(auth);
-  });
+      btn.innerText = "Connexion...";
+      loginError.style.display = 'none';
 
-  // --- DATA INIT ---
-  async function initData() {
-    indexQuestions();
-
-    // On NE charge PLUS la collection "corrections" (ancien modèle).
-    // On garde reports/stats comme avant pour l'instant.
-    await Promise.all([loadReports(), loadStats()]);
-
-    initUI();
-    dataLoaded = true;
-  }
-
-  async function loadReports() {
-    try {
-      reportsMap = {};
-      const snapshot = await getDocs(collection(db, "reports"));
-      snapshot.forEach(docu => {
-        const data = docu.data();
-        const qId = data.questionId;
-        if (!reportsMap[qId]) reportsMap[qId] = [];
-        reportsMap[qId].push({ 
-          id: docu.id, reason: data.reason, 
-          date: data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : '?' 
+      signInWithEmailAndPassword(auth, email, password)
+        .catch((error) => {
+          console.error(error);
+          loginError.style.display = 'block';
+          loginError.innerText = "Email ou mot de passe incorrect.";
+        })
+        .finally(() => {
+          btn.innerText = "Se connecter";
         });
-      });
-    } catch (e) { console.error("Erreur signalements:", e); }
-  }
+    });
 
-  async function loadStats() {
-    try {
-      const snapshot = await getDocs(collection(db, "stats"));
-      snapshot.forEach(docu => statsMap[docu.id] = docu.data());
-    } catch (e) { console.error("Erreur stats:", e); }
-  }
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-  // --- UI ---
-  function initUI() {
-    const selector = document.getElementById("bankSelector");
-    let options = '<option value="all">Toutes les banques</option>';
-    options += '<option value="reported" style="background:#3c1f1f; color:#e74c3c; font-weight:bold;">⚠️ Voir les Signalements</option>';
-    options += '<option disabled>------------------------</option>';
-    Object.keys(banks).forEach(key => options += `<option value="${key}">${banks[key].label}</option>`);
-    
-    selector.innerHTML = options;
-    selector.onchange = () => { renderQuestions(selector.value); };
-    renderQuestions("all");
-  }
+    // --- DATA INIT ---
+    async function initData() {
+      indexQuestions();
+      await Promise.all([loadReports(), loadStats()]);
+      initUI();
+      dataLoaded = true;
+    }
 
-  async function renderQuestions(bankKey) {
-    const list = document.getElementById("questionsList");
-    list.innerHTML = "";
-
-    let questionsToShow = [];
-
-    if (bankKey === "reported") {
-      Object.values(banks).forEach(b => {
-        b.questions.forEach(q => {
-          if (reportsMap[q.id] && reportsMap[q.id].length > 0) questionsToShow.push(q);
+    async function loadReports() {
+      // NOTE: pas optimisé (lit tout). On peut paginer plus tard.
+      try {
+        reportsMap = {};
+        const snapshot = await getDocs(collection(db, "reports"));
+        snapshot.forEach(docu => {
+          const data = docu.data();
+          const qId = data.questionId;
+          if (!reportsMap[qId]) reportsMap[qId] = [];
+          reportsMap[qId].push({
+            id: docu.id,
+            reason: data.reason,
+            date: data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : '?'
+          });
         });
-      });
-      if (questionsToShow.length === 0) {
-        list.innerHTML = "<div style='text-align:center; padding:40px; color:#aaa;'>Aucun signalement.</div>";
+      } catch (e) {
+        console.error("Erreur signalements:", e);
+      }
+    }
+
+    async function loadStats() {
+      // NOTE: pas optimisé (lit tout). On peut faire “by ids” plus tard.
+      try {
+        statsMap = {};
+        const snapshot = await getDocs(collection(db, "stats"));
+        snapshot.forEach(docu => statsMap[docu.id] = docu.data());
+      } catch (e) {
+        console.error("Erreur stats:", e);
+      }
+    }
+
+    // --- UI ---
+    function initUI() {
+      let options = '<option value="all">Toutes les banques</option>';
+      options += '<option value="reported" style="background:#3c1f1f; color:#e74c3c; font-weight:bold;">⚠️ Voir les Signalements</option>';
+      options += '<option disabled>------------------------</option>';
+      for (const key of bankKeys) {
+        const label = banks[key]?.label || key;
+        options += `<option value="${key}">${label}</option>`;
+      }
+
+      bankSelector.innerHTML = options;
+      bankSelector.onchange = () => { renderQuestions(bankSelector.value); };
+      renderQuestions("all");
+
+      // migration buttons
+      migrateBtn.onclick = () => migrateCorrections({ dryRun: false });
+      migrateDryBtn.onclick = () => migrateCorrections({ dryRun: true });
+      clearBankCacheBtn.onclick = () => {
+        try {
+          for (const key of Object.keys(localStorage)) {
+            if (key.startsWith("qbank_corr_bank_")) localStorage.removeItem(key);
+          }
+          resetLog();
+          logLine("✅ Cache local qbank_corr_bank_* supprimé.");
+        } catch {
+          resetLog();
+          logLine("⚠️ Impossible de vider le cache local (localStorage bloqué).");
+        }
+      };
+    }
+
+    async function renderQuestions(bankKey) {
+      const list = document.getElementById("questionsList");
+      list.innerHTML = "";
+
+      let questionsToShow = [];
+
+      if (bankKey === "reported") {
+        for (const bk of bankKeys) {
+          const qs = banks[bk]?.questions || [];
+          for (const q of qs) {
+            if (reportsMap[q.id] && reportsMap[q.id].length > 0) questionsToShow.push(q);
+          }
+        }
+        if (questionsToShow.length === 0) {
+          list.innerHTML = "<div style='text-align:center; padding:40px; color:#aaa;'>Aucun signalement.</div>";
+          return;
+        }
+      } else if (bankKey === "all") {
+        for (const bk of bankKeys) {
+          questionsToShow.push(...(banks[bk]?.questions || []));
+        }
+      } else if (banks[bankKey]) {
+        questionsToShow = banks[bankKey].questions || [];
+      }
+
+      if (bankKey !== "reported" && questionsToShow.length > 600) {
+        questionsToShow = questionsToShow.slice(0, 600);
+      }
+
+      // Load needed bank correction docs (1 read per bank)
+      const neededBanks = new Set();
+      for (const q of questionsToShow) if (q && q._bankKey) neededBanks.add(q._bankKey);
+
+      for (const bk of neededBanks) {
+        await ensureCorrectionsLoaded(bk);
+      }
+
+      // Render
+      for (const q of questionsToShow) {
+        const card = document.createElement("div");
+        card.className = "q-card";
+
+        const savedIndex = getSavedAnswerIndex(q);
+        const currentIndex = (savedIndex !== undefined) ? savedIndex : q.answerIndex;
+        const isModified = (savedIndex !== undefined && savedIndex !== q.answerIndex);
+
+        const reports = reportsMap[q.id] || [];
+        const hasReports = reports.length > 0;
+
+        const qStats = statsMap[q.id] || { total: 0 };
+        const totalVotes = qStats.total || 0;
+
+        if (hasReports) card.style.border = "2px solid #e74c3c";
+
+        let html = `
+          <div class="q-header">
+            <span>ID: ${q.id} <span style="font-weight:normal; opacity:0.6;">(${totalVotes} votes)</span></span>
+            <div>
+              ${isModified ? '<span class="badge badge-mod">✏️ MODIFIÉ</span>' : ''}
+              ${hasReports ? `<span class="badge badge-alert">⚠️ ${reports.length}</span>` : ''}
+            </div>
+          </div>
+          <div class="q-stem">${q.stem}</div>
+        `;
+
+        if (hasReports) {
+          html += `<div class="report-box"><strong style="color:var(--red)">Plaintes :</strong><div style="margin-top:10px">`;
+          for (const r of reports) {
+            html += `<div class="report-item">
+                      <span>"${r.reason}"</span>
+                      <button onclick="window.deleteReport('${r.id}', this)" class="btn-delete">🗑️</button>
+                    </div>`;
+          }
+          html += `</div></div>`;
+        }
+
+        q.choices.forEach((choice, idx) => {
+          const isSelected = (idx === currentIndex);
+          const count = qStats[idx] || 0;
+          const percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+          const safeId = q.id.replace(/'/g, "\\'");
+
+          html += `
+            <div class="choice ${isSelected ? 'is-correct' : ''}"
+                 onclick="window.updateAnswer('${safeId}', ${idx}, this)">
+              <div class="stat-bar" style="width:${percent}%;"></div>
+              <span>${String.fromCharCode(65 + idx)}. ${choice}</span>
+              <span style="position:relative; z-index:2; display:flex; align-items:center;">
+                <span class="stat-percent">${percent}%</span>
+                ${isSelected ? '<span style="margin-left:8px">✅</span>' : ''}
+              </span>
+            </div>
+          `;
+        });
+
+        card.innerHTML = html;
+        list.appendChild(card);
+      }
+    }
+
+    // --- GLOBALS ---
+    window.updateAnswer = async function(qId, newIndex, el) {
+      if (!confirm("Changer la bonne réponse ?")) return;
+
+      const q = questionById[qId];
+      if (!q || !q._bankKey) {
+        alert("Erreur: banque introuvable pour cette question.");
         return;
       }
-    } else if (bankKey === "all") {
-      Object.values(banks).forEach(b => questionsToShow.push(...b.questions));
-    } else if (banks[bankKey]) {
-      questionsToShow = banks[bankKey].questions;
-    }
+      const bankKey = q._bankKey;
 
-    if (bankKey !== "reported" && questionsToShow.length > 600) {
-      questionsToShow = questionsToShow.slice(0, 600);
-    }
+      try {
+        await ensureCorrectionsLoaded(bankKey);
 
-    // --- Charger les corrections nécessaires (1 doc par banque) ---
-    // Pour bankKey spécifique: 1 read
-    // Pour "all"/"reported": on charge seulement les banques qui apparaissent dans les questions listées
-    const neededBanks = new Set();
-    questionsToShow.forEach(q => {
-      if (q && q._bankKey) neededBanks.add(q._bankKey);
-    });
+        // Write to correctionsByBank/{bankKey}
+        await setDoc(
+          doc(db, "correctionsByBank", bankKey),
+          {
+            updatedAt: serverTimestamp(),
+            answers: { [qId]: newIndex }
+          },
+          { merge: true }
+        );
 
-    for (const bk of neededBanks) {
-      await ensureCorrectionsLoaded(bk);
-    }
+        // Update local cache in memory
+        bankCorrectionsCache[bankKey] = bankCorrectionsCache[bankKey] || { answers: {}, loaded: true };
+        bankCorrectionsCache[bankKey].answers[qId] = newIndex;
 
-    // --- RENDER ---
-    questionsToShow.forEach(q => {
-      const card = document.createElement("div");
-      card.className = "q-card";
-
-      const savedIndex = getSavedAnswerIndex(q);
-      const currentIndex = (savedIndex !== undefined) ? savedIndex : q.answerIndex;
-      const isModified = (savedIndex !== undefined && savedIndex !== q.answerIndex);
-
-      const reports = reportsMap[q.id] || [];
-      const hasReports = reports.length > 0;
-
-      const qStats = statsMap[q.id] || { total: 0 };
-      const totalVotes = qStats.total || 0;
-
-      if (hasReports) card.style.border = "2px solid #e74c3c";
-
-      let html = `<div class="q-header">
-                    <span>ID: ${q.id} <span style="font-weight:normal; opacity:0.6;">(${totalVotes} votes)</span></span>
-                    <div>
-                        ${isModified ? '<span class="badge badge-mod">✏️ MODIFIÉ</span>' : ''}
-                        ${hasReports ? `<span class="badge badge-alert">⚠️ ${reports.length}</span>` : ''}
-                    </div>
-                  </div>
-                  <div class="q-stem">${q.stem}</div>`;
-
-      if (hasReports) {
-        html += `<div class="report-box"><strong style="color:var(--red)">Plaintes :</strong><div style="margin-top:10px">`;
-        reports.forEach(r => {
-          html += `<div class="report-item"><span>"${r.reason}"</span>
-                     <button onclick="window.deleteReport('${r.id}', this)" class="btn-delete">🗑️</button></div>`;
+        // Update UI
+        const parent = el.parentElement;
+        parent.querySelectorAll('.choice').forEach(c => {
+          c.classList.remove('is-correct');
+          // remove ✅ if present
+          const last = c.querySelector('span span:last-child');
+          if (last && last.textContent.trim() === "✅") last.remove();
         });
-        html += `</div></div>`;
+
+        el.classList.add('is-correct');
+        el.querySelector('span').innerHTML += '<span style="margin-left:8px">✅</span>';
+
+        const hdr = el.closest('.q-card').querySelector('.q-header div');
+        if (!hdr.querySelector('.badge-mod')) {
+          hdr.innerHTML = '<span class="badge badge-mod">✏️ MODIFIÉ</span>' + hdr.innerHTML;
+        }
+
+      } catch (e) {
+        alert("Erreur: " + (e?.message || e));
       }
+    };
 
-      q.choices.forEach((choice, idx) => {
-        const isSelected = (idx === currentIndex);
-        const count = qStats[idx] || 0;
-        const percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-
-        // On utilise q.id tel quel dans l'UI, mais on échappe les quotes pour l'onclick
-        const safeId = q.id.replace(/'/g, "\\'");
-
-        html += `<div class="choice ${isSelected ? 'is-correct' : ''}" onclick="window.updateAnswer('${safeId}', ${idx}, this)">
-                   <div class="stat-bar" style="width: ${percent}%;"></div>
-                   <span>${String.fromCharCode(65+idx)}. ${choice}</span>
-                   <span style="position:relative; z-index:2; display:flex; align-items:center;">
-                     <span class="stat-percent">${percent}%</span>
-                     ${isSelected ? '<span style="margin-left:8px">✅</span>' : ''}
-                   </span>
-                 </div>`;
-      });
-
-      card.innerHTML = html;
-      list.appendChild(card);
-    });
-  }
-
-  // --- Fonctions Globales ---
-  window.updateAnswer = async function(qId, newIndex, el) {
-    if (!confirm("Changer la bonne réponse ?")) return;
-
-    const q = questionById[qId];
-    if (!q || !q._bankKey) {
-      alert("Erreur: banque introuvable pour cette question.");
-      return;
-    }
-
-    const bankKey = q._bankKey;
-
-    try {
-      // Assure doc en cache (optionnel mais pratique)
-      await ensureCorrectionsLoaded(bankKey);
-
-      // Écriture "corrections by bank"
-      // correctionsByBank/{bankKey} => { updatedAt, answers: { [qId]: newIndex } }
-      await setDoc(
-        doc(db, "correctionsByBank", bankKey),
-        { 
-          updatedAt: serverTimestamp(),
-          answers: { [qId]: newIndex }
-        },
-        { merge: true }
-      );
-
-      // Mise à jour cache local
-      bankCorrectionsCache[bankKey] = bankCorrectionsCache[bankKey] || { answers: {}, loaded: true };
-      bankCorrectionsCache[bankKey].answers[qId] = newIndex;
-
-      // Mise à jour UI (comme avant)
-      const parent = el.parentElement;
-      parent.querySelectorAll('.choice').forEach(c => {
-        c.classList.remove('is-correct');
-        const chk = c.querySelector('span span:last-child');
-        if (chk && chk.innerText === "✅") chk.remove();
-      });
-
-      el.classList.add('is-correct');
-      el.querySelector('span').innerHTML += '<span style="margin-left:8px">✅</span>';
-      
-      const hdr = el.closest('.q-card').querySelector('.q-header div');
-      if (!hdr.querySelector('.badge-mod')) {
-        hdr.innerHTML = '<span class="badge badge-mod">✏️ MODIFIÉ</span>' + hdr.innerHTML;
+    window.deleteReport = async function(rId, btn) {
+      if (!confirm("Supprimer ce signalement ?")) return;
+      try {
+        await deleteDoc(doc(db, "reports", rId));
+        btn.parentElement.remove();
+      } catch(e) {
+        console.error(e);
       }
+    };
 
-    } catch (e) { 
-      alert("Erreur: " + e.message); 
+    // ---------------------------------------------------------
+    // MIGRATION: corrections/{qId}  -> correctionsByBank/{bankKey}
+    // ---------------------------------------------------------
+    async function migrateCorrections({ dryRun }) {
+      resetLog();
+
+      if (!confirm(dryRun
+        ? "Dry-run: analyser les corrections existantes sans écrire. Continuer ?"
+        : "Migration: écrire dans correctionsByBank. Continuer ?"
+      )) return;
+
+      setBusy(migrateBtn, true, "Migration...", "🚚 Migrer corrections → correctionsByBank");
+      setBusy(migrateDryBtn, true, "Dry-run...", "🔎 Dry-run (sans écrire)");
+
+      try {
+        logLine("1) Lecture de la collection 'corrections' (ancien modèle)...");
+        const snap = await getDocs(collection(db, "corrections"));
+        logLine(`   → ${snap.size} documents trouvés.`);
+
+        const grouped = {};   // { bankKey: { qId: idx } }
+        const skipped = [];   // qIds sans bankKey
+        let valid = 0;
+
+        logLine("2) Groupement par banque à partir des banques chargées (bank scripts)...");
+        snap.forEach(d => {
+          const qId = d.id;
+          const data = d.data() || {};
+          const idx = data.answerIndex;
+
+          if (typeof idx !== "number") return;
+
+          const q = questionById[qId];
+          const bk = q?._bankKey;
+
+          if (!bk) {
+            skipped.push(qId);
+            return;
+          }
+          grouped[bk] = grouped[bk] || {};
+          grouped[bk][qId] = idx;
+          valid++;
+        });
+
+        const bankCount = Object.keys(grouped).length;
+        logLine(`   → Corrections valides groupées: ${valid}`);
+        logLine(`   → Banques impactées: ${bankCount}`);
+
+        if (skipped.length > 0) {
+          logLine(`   ⚠️ ${skipped.length} corrections ignorées (bankKey introuvable).`);
+          logLine(`   Exemples: ${skipped.slice(0, 10).join(", ")}${skipped.length > 10 ? ", ..." : ""}`);
+        }
+
+        if (dryRun) {
+          logLine("\nDRY-RUN terminé. Aucun write effectué.");
+          // Détail par banque
+          for (const bk of Object.keys(grouped)) {
+            const n = Object.keys(grouped[bk]).length;
+            logLine(` - ${bk}: ${n} corrections`);
+          }
+          return;
+        }
+
+        if (bankCount === 0) {
+          logLine("❌ Aucune banque à migrer (rien à écrire).");
+          return;
+        }
+
+        logLine("\n3) Écriture vers correctionsByBank/{bankKey} ...");
+        let done = 0;
+        for (const bk of Object.keys(grouped)) {
+          const answers = grouped[bk];
+          const n = Object.keys(answers).length;
+
+          await setDoc(
+            doc(db, "correctionsByBank", bk),
+            {
+              updatedAt: serverTimestamp(),
+              answers
+            },
+            { merge: true }
+          );
+
+          done++;
+          logLine(`   ✅ [${done}/${bankCount}] Écrit ${n} corrections dans correctionsByBank/${bk}`);
+        }
+
+        logLine("\n✅ Migration terminée.");
+        logLine("Recommandation: après validation, tu peux cesser d'utiliser la collection 'corrections' côté app.");
+
+      } catch (e) {
+        console.error(e);
+        logLine("❌ Erreur durant migration: " + (e?.message || e));
+      } finally {
+        setBusy(migrateBtn, false, "Migration...", "🚚 Migrer corrections → correctionsByBank");
+        setBusy(migrateDryBtn, false, "Dry-run...", "🔎 Dry-run (sans écrire)");
+      }
     }
-  };
-
-  window.deleteReport = async function(rId, btn) {
-    if (!confirm("Supprimer ce signalement ?")) return;
-    try {
-      await deleteDoc(doc(db, "reports", rId));
-      btn.parentElement.remove();
-    } catch(e) { console.error(e); }
-  };
-
-</script>
+  </script>
 </body>
 </html>
