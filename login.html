@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Connexion - Quiz Psychiatrie</title>
   <style>
-    /* --- Thème Deep Night (Identique à l'index) --- */
     :root {
       --bg-color: #0b1021;
       --card-bg: #161c33;
@@ -15,7 +14,6 @@
       --text-muted: #a0aec0;
       --border-color: rgba(255, 255, 255, 0.1);
       --error: #e74c3c;
-      --success: #2ecc71;
     }
 
     body {
@@ -27,14 +25,6 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
-    }
-
-    .login-container {
-      width: 100%;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
     }
 
     .login-card {
@@ -42,210 +32,101 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 40px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       width: 100%;
-      max-width: 400px;
+      max-width: 350px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Petite barre décorative en haut */
-    .login-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-blue), #8e44ad);
     }
 
     h1 {
-      margin: 0 0 8px 0;
-      color: var(--text-main);
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      margin: 0 0 32px 0;
-      font-size: 14px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    label {
-      display: block;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin: 0 0 24px 0;
+      color: var(--primary-blue);
+      font-size: 24px;
     }
 
     input {
       width: 100%;
-      padding: 14px;
-      background: rgba(0, 0, 0, 0.2);
+      padding: 12px;
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 8px;
       color: var(--text-main);
       font-size: 16px;
-      box-sizing: border-box;
-      transition: all 0.2s ease;
+      box-sizing: border-box; /* Important pour le padding */
     }
 
     input:focus {
       outline: none;
       border-color: var(--primary-blue);
-      background: rgba(77, 171, 247, 0.05);
-      box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+      background: var(--accent-blue);
     }
 
     button {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       background: var(--primary-blue);
       color: #0b1021;
       font-weight: 700;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 0.1s, opacity 0.2s;
-      margin-top: 10px;
+      transition: opacity 0.2s;
     }
 
     button:hover {
       opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
     }
 
     #errorMsg {
-      background: rgba(231, 76, 60, 0.1);
-      border: 1px solid rgba(231, 76, 60, 0.3);
       color: var(--error);
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 20px;
+      margin-top: 16px;
       font-size: 14px;
-      font-weight: 500;
       display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Animation de secousse en cas d'erreur */
-    .shake {
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-    }
-
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <div class="login-card" id="card">
-      <h1>Quiz Psychiatrie</h1>
-      <p class="subtitle">Veuillez vous authentifier pour accéder aux banques.</p>
-      
-      <form id="loginForm">
-        <div class="input-group">
-          <label for="username">Identifiant</label>
-          <input type="text" id="username" placeholder="ex: psychiatrie" autocomplete="username" required>
-        </div>
-        
-        <div class="input-group">
-          <label for="password">Mot de passe</label>
-          <input type="password" id="password" placeholder="••••" autocomplete="current-password" required>
-        </div>
-        
-        <button type="submit" id="submitBtn">Se connecter</button>
-      </form>
-
-      <div id="errorMsg">Identifiant ou mot de passe incorrect.</div>
-    </div>
+  <div class="login-card">
+    <h1>Quiz Psychiatrie</h1>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="username" required>
+      <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
+      <button type="submit">Se connecter</button>
+    </form>
+    <div id="errorMsg">Identifiants incorrects.</div>
   </div>
 
   <script>
-    // --- Configuration de Sécurité ---
-    // Nom d'utilisateur attendu
-    const VALID_USER = "psychiatrie";
-  
-    const VALID_PASS = "2026";
-
-    // --- Logique ---
     const form = document.getElementById('loginForm');
     const errorMsg = document.getElementById('errorMsg');
-    const card = document.getElementById('card');
-    const btn = document.getElementById('submitBtn');
 
-    // Fonction utilitaire pour hacher une chaîne en SHA-256
-    async function sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
+    // Identifiants définis
+    const VALID_USER = "psychiatrie";
+    const VALID_PASS = "2026";
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       
-      // Feedback visuel (chargement)
-      const originalBtnText = btn.innerText;
-      btn.innerText = "Vérification...";
-      btn.disabled = true;
-      errorMsg.style.display = 'none';
-
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value.trim();
 
-      // Hachage du mot de passe entré
-      const userHash = await sha256(pass);
-
-      // Petite pause artificielle pour éviter les attaques par force brute trop rapides (optionnel)
-      await new Promise(r => setTimeout(r, 400));
-
-      // Comparaison
-      if (user.toLowerCase() === VALID_USER && userHash === VALID_HASH) {
-        // Succès : on enregistre le jeton et on redirige
+      if (user === VALID_USER && pass === VALID_PASS) {
+        // Stockage de la session
         sessionStorage.setItem('auth_token', 'connected');
+        // Redirection vers l'index
         window.location.href = 'index.html';
       } else {
-        // Échec
         errorMsg.style.display = 'block';
-        card.classList.remove('shake');
-        void card.offsetWidth; // Trigger reflow pour rejouer l'animation
-        card.classList.add('shake');
-        
-        // Reset bouton
-        btn.innerText = originalBtnText;
-        btn.disabled = false;
-        
-        // Vider le mot de passe
-        document.getElementById('password').value = '';
-        document.getElementById('password').focus();
+        // Animation de secousse (optionnel)
+        document.querySelector('.login-card').animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-10px)' },
+          { transform: 'translateX(10px)' },
+          { transform: 'translateX(0)' }
+        ], { duration: 300 });
       }
     });
   </script>
